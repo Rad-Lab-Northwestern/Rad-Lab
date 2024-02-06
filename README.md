@@ -3,7 +3,7 @@ This branch contains the cardiac device models used in the Rad lab. Read the tex
 
 ## Current summary of models available
 
-### Folder Name: Child_Cardiac_Sanpitak_2022
+### Folder Name: Child_Cardiac_Trajectories_Sanpitak_2022
 
 **Brief Description:** 10 child models, 5 with 58 cm endocardial leads, and 5 with 35 cm epicardial leads
 
