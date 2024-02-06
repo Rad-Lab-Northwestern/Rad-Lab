@@ -1,7 +1,7 @@
 # Phantoms
 This branch contains the human body models used in the Rad lab. Read the text file associated with each folder to learn more.
 
-## Current summary of models available
+## Summary of models currently available
 
 ### Folder Name: Adult_phantom_model
 
