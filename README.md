@@ -1,7 +1,7 @@
 # Deep Brain Stimulation Models
 This branch contains the deep brain stimulation models used in the Rad lab. Read the text file associated with each publication to learn more.
 
-## Current summary of models available
+## Summary of models currently available
 
 ### Folder Name: Adult_DBS_Trajectories_Sanpitak_2022
 
