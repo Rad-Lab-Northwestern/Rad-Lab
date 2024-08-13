@@ -4,6 +4,7 @@ This is the repository containing GUI for predication of temretaure rise around 
 Firts 5 second(with 0.5 s resolution =11 points) of temperature profiel upload and the model predict temperature after 150s.
 
 Install packages:
+
     Keras
     TensorFlow
     sciket-learn
@@ -13,4 +14,4 @@ Install packages:
     pyuic6
     pyside6-rcc
     pyinstaller
-
+    
