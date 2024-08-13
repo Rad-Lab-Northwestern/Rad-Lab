@@ -1,8 +1,16 @@
-# Rad-Lab
-This is the repository containing files for Dr. Rad's lab and publications. 
+# GUI for AI Thermometry prediction
+This is the repository containing GUI for predication of temretaure rise around tip of active implant (like DBS) during RF pulse with AI models. 
 
-We believe in the power of collaboration and transparency, and so we are making our deep brain stimulation and cardiac implant patient models available. 
+Firts 5 second(with 0.5 s resolution =11 points) of temperature profiel upload and the model predict temperature after 150s.
 
-If you choose to use any of the models in your projects, please cite the paper that they are associated with. This information can be found in the text file associated with each publication.
+Install packages:
+    Keras
+    TensorFlow
+    sciket-learn
+    seaborn
+    pyside6
+    pyqt6-tools
+    pyuic6
+    pyside6-rcc
+    pyinstaller
 
-We've created lots of models over the years, so thank you for waiting as we continue to prepare our archive so it can be easily used by everyone!
