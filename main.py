@@ -64,7 +64,8 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
         super(mainApp,self).__init__(parent)
         self.setupUi(self)
         self.dataset=None
-        self.modeladdress=''
+        self.PredictModeladdress=''
+        self.PredictDataaddress=''
         
 
         h5fileslist=[f for f in os.listdir(ModelPath) if os.path.isfile(os.path.join(ModelPath,f)) and f.endswith('.h5')]
@@ -76,7 +77,7 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
         self.comboBoxModels.setCurrentIndex(1)
         self.comboBoxModels.currentIndexChanged.connect(self.on_comboBoxModels_indexchanged)
         self.labelModelFileName.setText('')
-        self.modeladdress=os.path.join(ModelPath,
+        self.PredictModeladdress=os.path.join(ModelPath,
                                         self.comboBoxModels.currentText()
                                         )        
 
@@ -118,8 +119,101 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
         self.on_radioButtonDataUpload_toggled()
         self.labelDataFileName.setText('')
         self.labelModelFileName.setText('')
-
+        self.pushButtonLoadData.setEnabled(False)
         # self.show()
+
+     
+    def on_comboBoxModels_indexchanged(self,index):
+        print(index)
+        if(index==0):
+            self.on_pushButtonLoadModel_clicked()
+        else:
+            self.labelModelFileName.setText('')
+            self.PredictModeladdress=os.path.join(ModelPath,
+                                           self.comboBoxModels.currentText()
+                                           )
+    
+    @QtCore.pyqtSlot()
+    def on_pushButtonLoadModel_clicked(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        fileName, _ = QFileDialog.getOpenFileName(self,
+                                                  "Load h5 Model", 
+                                                  ModelPath,"h5 Files (*.h5)",
+                                                    options=options
+                                                    )
+        if(fileName):
+            self.comboBoxModels.setCurrentIndex(0)
+            self.labelModelFileName.setText(QFileInfo(fileName).fileName())
+            self.PredictModeladdress=fileName
+            print(self.PredictModeladdress)
+
+    def on_radioButtonDataUpload_toggled(self):
+        self.pushButtonLoadData.setEnabled(self.radioButtonDataUpload.isChecked())
+        self.checkBoxWithHeader.setEnabled(self.radioButtonDataUpload.isChecked())
+        self.pushButtonLoadData.setEnabled(False)
+        if(self.radioButtonDataUpload.isChecked()):
+            for row in range(self.tableWidgetData.rowCount()):
+                item0=self.tableWidgetData.item(row,0)
+                item1=self.tableWidgetData.item(row,1)
+                if(item0):
+                    item0.setFlags(item0.flags() ^ QtCore.Qt.ItemIsEditable)
+                if(item1):
+                    item1.setFlags(item1.flags() ^ QtCore.Qt.ItemIsEditable)
+
+    def on_radioButtonDataTable_toggled(self):
+        self.pushButtonLoadData.setEnabled(False)
+        if(self.radioButtonDataTable.isChecked()):
+            self.labelDataFileName.setText('')
+            for row in range(self.tableWidgetData.rowCount()):
+                item0=self.tableWidgetData.item(row,0)
+                item1=self.tableWidgetData.item(row,1)
+                if(item0):
+                    item0.setFlags(item0.flags() | QtCore.Qt.ItemIsEditable)
+                if(item1):
+                    item1.setFlags(item1.flags() | QtCore.Qt.ItemIsEditable)
+
+    @QtCore.pyqtSlot()
+    def on_pushButtonLoadDataFile_clicked(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        fileName, _ = QFileDialog.getOpenFileName(self,
+                                                  "Load Data", 
+                                                  "","CsV Files (*.csv)",
+                                                    options=options
+                                                    )
+        if(fileName):
+            # print(fileName)
+            self.labelDataFileName.setText(QFileInfo(fileName).fileName())
+            self.PredictDataaddress=fileName
+            self.pushButtonLoadData.setEnabled(True)
+
+    @QtCore.pyqtSlot()
+    def on_pushButtonLoadData_clicked(self):
+        if(self.checkBoxWithHeader.isChecked()):
+            self.dataset=pd.read_csv(self.PredictDataaddress)
+        else:
+            self.dataset=pd.read_csv(self.PredictDataaddress,header=None)
+
+        dataset=self.dataset.reset_index()
+        r=0
+        for index,row in  dataset.iterrows() :
+            if(index==0 and self.checkBoxWithHeader.isChecked()):
+                pass
+            else:
+                c0=QTableWidgetItem(str(row[0]))
+                c1=QTableWidgetItem(str(row[1]))
+                c0.setFlags(c0.flags() ^ QtCore.Qt.ItemIsEditable)
+                c1.setFlags(c1.flags() ^ QtCore.Qt.ItemIsEditable)
+                self.tableWidgetData.setItem(r,0,c0)
+                self.tableWidgetData.setItem(r,1,c1)
+                r+=1
+
+    def  on_tableWidgetData_cellPressed(self,row,column):
+        print(row,column)
+        item=self.tableWidgetData.item(row,column)
+        # if(item):
+        #    print(item.text())
 
     @QtCore.pyqtSlot()
     def on_pushButtonPredict_clicked(self):
@@ -153,98 +247,13 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
                 time.append(float(item0.text()))
                 temperature.append(float(item1.text()))
             self.dataset=pd.DataFrame([*zip(time,temperature)])
-        model=load_model(self.modeladdress)
+        model=load_model(self.PredictModeladdress)
         print(model.summary())
         data_x=self.dataset.iloc[:,1].values.astype('float')
         data_x=np.reshape(data_x,(1,11))
         result=model.predict(data_x)
         print(result[0])
         self.lcdNumberPredictedTemperature.display('{:.02f}'.format(result[0][0]))
-    
-    def on_comboBoxModels_indexchanged(self,index):
-        print(index)
-        if(index==0):
-            self.on_pushButtonLoadModel_clicked()
-        else:
-            self.labelModelFileName.setText('')
-            self.modeladdress=os.path.join(ModelPath,
-                                           self.comboBoxModels.currentText()
-                                           )
-    
-    @QtCore.pyqtSlot()
-    def on_pushButtonLoadModel_clicked(self):
-        options = QFileDialog.Options()
-        options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getOpenFileName(self,
-                                                  "Load h5 Model", 
-                                                  ModelPath,"h5 Files (*.h5)",
-                                                    options=options
-                                                    )
-        if(fileName):
-            self.comboBoxModels.setCurrentIndex(0)
-            self.labelModelFileName.setText(QFileInfo(fileName).fileName())
-            self.modeladdress=fileName
-            print(self.modeladdress)
-
-    def on_radioButtonDataUpload_toggled(self):
-        self.pushButtonLoadData.setEnabled(self.radioButtonDataUpload.isChecked())
-        self.checkBoxWithHeader.setEnabled(self.radioButtonDataUpload.isChecked())
-        if(self.radioButtonDataUpload.isChecked()):
-            for row in range(self.tableWidgetData.rowCount()):
-                item0=self.tableWidgetData.item(row,0)
-                item1=self.tableWidgetData.item(row,1)
-                if(item0):
-                    item0.setFlags(item0.flags() ^ QtCore.Qt.ItemIsEditable)
-                if(item1):
-                    item1.setFlags(item1.flags() ^ QtCore.Qt.ItemIsEditable)
-
-    def on_radioButtonDataTable_toggled(self):
-        if(self.radioButtonDataTable.isChecked()):
-            self.labelDataFileName.setText('')
-            for row in range(self.tableWidgetData.rowCount()):
-                item0=self.tableWidgetData.item(row,0)
-                item1=self.tableWidgetData.item(row,1)
-                if(item0):
-                    item0.setFlags(item0.flags() | QtCore.Qt.ItemIsEditable)
-                if(item1):
-                    item1.setFlags(item1.flags() | QtCore.Qt.ItemIsEditable)
-
-    @QtCore.pyqtSlot()
-    def on_pushButtonLoadData_clicked(self):
-        options = QFileDialog.Options()
-        options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getOpenFileName(self,
-                                                  "Load Data", 
-                                                  "","CsV Files (*.csv)",
-                                                    options=options
-                                                    )
-        if(fileName):
-            # print(fileName)
-            self.labelDataFileName.setText(QFileInfo(fileName).fileName())
-            if(self.checkBoxWithHeader.isChecked()):
-                self.dataset=pd.read_csv(fileName)
-            else:
-                self.dataset=pd.read_csv(fileName,header=None)
-
-            dataset=self.dataset.reset_index()
-            r=0
-            for index,row in  dataset.iterrows() :
-                if(index==0 and self.checkBoxWithHeader.isChecked()):
-                    pass
-                else:
-                    c0=QTableWidgetItem(str(row[0]))
-                    c1=QTableWidgetItem(str(row[1]))
-                    c0.setFlags(c0.flags() ^ QtCore.Qt.ItemIsEditable)
-                    c1.setFlags(c1.flags() ^ QtCore.Qt.ItemIsEditable)
-                    self.tableWidgetData.setItem(r,0,c0)
-                    self.tableWidgetData.setItem(r,1,c1)
-                    r+=1
-
-    def  on_tableWidgetData_cellPressed(self,row,column):
-        print(row,column)
-        item=self.tableWidgetData.item(row,column)
-        # if(item):
-        #    print(item.text())
 """
     Star Main code
 """
