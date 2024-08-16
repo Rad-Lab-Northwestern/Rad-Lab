@@ -19,4 +19,4 @@ converting Ui to Py files:
 
 Convert py files to one main executable file:
 
-    pyinstaller --noconsole  --onefile --windowed main.py -n main.exe
+    pyinstaller --noconsole  --onefile --windowed --additional-hooks-dir=hooks  -F --clean myscript.spec main.py -n main.exe

@@ -7,7 +7,7 @@ from time import sleep
 """
 # import tesnsorflow.keras as keras
 # from tensorflow.keras.models import Sequential
-# from tensorflow.keras.models import load_model
+from tensorflow.keras.models import load_model
 # from tensorflow.keras.layers import Dense
 # from tensorflow.keras import activations
 # from tensorflow.keras import losses
@@ -15,7 +15,7 @@ from time import sleep
 # from tensorflow.keras import metrics
 # from tensorflow.keras import backend as K
 # from tensorflow.keras.wrappers.scikit_learn import KerasRegressor
-# import numpy as np
+import numpy as np
 # import seaborn as sns
 # from sklearn.metrics import r2_score
 # from sklearn.metrics import mean_squared_error
@@ -64,6 +64,8 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
         super(mainApp,self).__init__(parent)
         self.setupUi(self)
         self.dataset=None
+        self.modeladdress=''
+        
 
         h5fileslist=[f for f in os.listdir(ModelPath) if os.path.isfile(os.path.join(ModelPath,f)) and f.endswith('.h5')]
         h5fileslist.insert(0,'---')
@@ -72,6 +74,11 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
         for file in h5fileslist:
             self.comboBoxModels.addItem(file)
         self.comboBoxModels.setCurrentIndex(1)
+        self.comboBoxModels.currentIndexChanged.connect(self.on_comboBoxModels_indexchanged)
+        self.labelModelFileName.setText('')
+        self.modeladdress=os.path.join(ModelPath,
+                                        self.comboBoxModels.currentText()
+                                        )        
 
         sc = MyCanvas(self, width=5, height=4, dpi=100)
         sc.axes.plot([0,1,2,3,4], [10,1,20,3,40])
@@ -101,8 +108,13 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
                     "background-color:white;"
                 "}"
             )
-        # self.lcdNumberPredictedTemperature.display('{:.01f}'.format(999.9))
-        self.lcdNumberPredictedTemperature.display('---.-')
+        self.lcdNumberPredictedTemperature.setStyleSheet(
+            "QLCDNumber{"
+            "color:rgb(0, 208, 0);"
+            # "background-color:rgb(0, 170, 255);"
+            "}"
+        )
+        self.lcdNumberPredictedTemperature.display('---.--')
         self.on_radioButtonDataUpload_toggled()
         self.labelDataFileName.setText('')
         self.labelModelFileName.setText('')
@@ -111,25 +123,54 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
 
     @QtCore.pyqtSlot()
     def on_pushButtonPredict_clicked(self):
-
         if self.radioButtonDataTable.isChecked():
-            print(self.tableWidgetData.rowCount())
-            print(self.tableWidgetData.columnCount())
+            time=[]
+            temperature=[]
             for row in range(self.tableWidgetData.rowCount()):
                 item0=self.tableWidgetData.item(row,0)
                 item1=self.tableWidgetData.item(row,1)
-                if(item0):
-                    print(int(item0.text()))
-                if(item1):
-                    print(int(item1.text()))
 
-    def on_comboBoxModels_currentIndexChanged(self,index):
+                print('row={row}'.format(row=row))
+
+                if(item0 and item0.text()!=''):
+                    pass
+                else:
+                    item = QTableWidgetItem()
+                    item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
+                    item.setText('0')
+                    self.tableWidgetData.setItem(row,0,item)
+                    item0=self.tableWidgetData.item(row,0)
+
+                if(item1 and item1.text()!=''):
+                    pass
+                else:
+                    item = QTableWidgetItem()
+                    item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
+                    item.setText('0')
+                    self.tableWidgetData.setItem(row,1,item)
+                    item1=self.tableWidgetData.item(row,1)  
+                
+                time.append(float(item0.text()))
+                temperature.append(float(item1.text()))
+            self.dataset=pd.DataFrame([*zip(time,temperature)])
+        model=load_model(self.modeladdress)
+        print(model.summary())
+        data_x=self.dataset.iloc[:,1].values.astype('float')
+        data_x=np.reshape(data_x,(1,11))
+        result=model.predict(data_x)
+        print(result[0])
+        self.lcdNumberPredictedTemperature.display('{:.02f}'.format(result[0][0]))
+    
+    def on_comboBoxModels_indexchanged(self,index):
+        print(index)
         if(index==0):
-            # self.on_pushButtonLoadModel_clicked()
-            pass
+            self.on_pushButtonLoadModel_clicked()
         else:
             self.labelModelFileName.setText('')
-
+            self.modeladdress=os.path.join(ModelPath,
+                                           self.comboBoxModels.currentText()
+                                           )
+    
     @QtCore.pyqtSlot()
     def on_pushButtonLoadModel_clicked(self):
         options = QFileDialog.Options()
@@ -142,15 +183,12 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
         if(fileName):
             self.comboBoxModels.setCurrentIndex(0)
             self.labelModelFileName.setText(QFileInfo(fileName).fileName())
-
-    def  on_tableWidgetData_cellPressed(self,row,column):
-        # print(row,column)
-        item=self.tableWidgetData.item(row,column)
-        # if(item):
-        #    print(item.text())
+            self.modeladdress=fileName
+            print(self.modeladdress)
 
     def on_radioButtonDataUpload_toggled(self):
         self.pushButtonLoadData.setEnabled(self.radioButtonDataUpload.isChecked())
+        self.checkBoxWithHeader.setEnabled(self.radioButtonDataUpload.isChecked())
         if(self.radioButtonDataUpload.isChecked()):
             for row in range(self.tableWidgetData.rowCount()):
                 item0=self.tableWidgetData.item(row,0)
@@ -183,18 +221,33 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
         if(fileName):
             # print(fileName)
             self.labelDataFileName.setText(QFileInfo(fileName).fileName())
-            self.dataset=pd.read_csv(fileName,header=None)
-            dataset=self.dataset.reset_index()
-            for index,row in  dataset.iterrows() :
-                # print(index,row[0],row[1])
-                c0=QTableWidgetItem(str(row[0]))
-                c1=QTableWidgetItem(str(row[1]))
-                c0.setFlags(c0.flags() ^ QtCore.Qt.ItemIsEditable)
-                c1.setFlags(c1.flags() ^ QtCore.Qt.ItemIsEditable)
-                self.tableWidgetData.setItem(index,0,c0)
-                self.tableWidgetData.setItem(index,1,c1)
-            
+            if(self.checkBoxWithHeader.isChecked()):
+                self.dataset=pd.read_csv(fileName)
+            else:
+                self.dataset=pd.read_csv(fileName,header=None)
 
+            dataset=self.dataset.reset_index()
+            r=0
+            for index,row in  dataset.iterrows() :
+                if(index==0 and self.checkBoxWithHeader.isChecked()):
+                    pass
+                else:
+                    c0=QTableWidgetItem(str(row[0]))
+                    c1=QTableWidgetItem(str(row[1]))
+                    c0.setFlags(c0.flags() ^ QtCore.Qt.ItemIsEditable)
+                    c1.setFlags(c1.flags() ^ QtCore.Qt.ItemIsEditable)
+                    self.tableWidgetData.setItem(r,0,c0)
+                    self.tableWidgetData.setItem(r,1,c1)
+                    r+=1
+
+    def  on_tableWidgetData_cellPressed(self,row,column):
+        print(row,column)
+        item=self.tableWidgetData.item(row,column)
+        # if(item):
+        #    print(item.text())
+"""
+    Star Main code
+"""
 def main():
     # df = pd.DataFrame([[1,2,3],[4,5,6]])
     # df = pd.DataFrame([*zip([1,2,3],[4,5,6])])
