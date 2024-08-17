@@ -1,17 +1,17 @@
 # GUI for AI Thermometry prediction
 This is the repository containing GUI for predication of temretaure rise around tip of active implant (like DBS) during RF pulse with AI models , is developing in RadLab.
 
-Firts 5 second(with 0.5 s resolution =11 points) of temperature profiel upload and the model predict temperature after 150s.
+Firts 5 second(with 0.5 s resolution =11 points) of temperature profile upload and the model predict temperature of plateau (~150s).
 
 Packages Installation:
 
-    conda create -n <env name> python=3.6
+    conda create -n radlab
+    activate  radlab
+    conda install tensorflow keras
+    conda install pyqt
     pip install pyqt5-tools
-    conda intsall tensorflow
-    conda install jupyter
-    conda install scikit-learn
-    conda install seaborn
-    pip install pyinstaller
+    conda install pandas
+    conda intsall matplotlib
 
 converting Ui to Py files:
 
@@ -19,4 +19,13 @@ converting Ui to Py files:
 
 Convert py files to one main executable file:
 
-    pyinstaller --noconsole  --onefile --windowed --additional-hooks-dir=hooks  -F --clean myscript.spec main.py -n main.exe
+    pyinstaller   --onefile   main.py -n main.exe
+
+Note:it took ~25s to load GUI
+## How Use
+1.in Predict Tab select Model or load h5 model(... button) 
+2.Select type ofData:
+    2.1 "Upload Data": select a cvs file (time,temperature) for 11 initial points.If data have header select "With header" checkbox.Then press "Load" button to show in Table
+    or
+    2.2 "Table": write time and Temperature in Table
+3.Press "predict" Button, wait ~2second

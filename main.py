@@ -7,7 +7,8 @@ from time import sleep
 """
 # import tesnsorflow.keras as keras
 # from tensorflow.keras.models import Sequential
-from tensorflow.keras.models import load_model
+# from tensorflow.keras.models import load_model
+from keras.models import load_model
 # from tensorflow.keras.layers import Dense
 # from tensorflow.keras import activations
 # from tensorflow.keras import losses
@@ -25,6 +26,7 @@ import pandas as pd
 """
     matplotlib import
 """
+
 import matplotlib
 matplotlib.use('Qt5Agg')
 import matplotlib.pyplot as plt
@@ -33,6 +35,7 @@ from matplotlib.figure import Figure
 """
     Qt import
 """
+
 from PyQt5 import QtCore, QtGui, QtWidgets,uic
 import PyQt5
 from PyQt5.QtWidgets import QApplication,QStyle,QMessageBox,QFileDialog,QVBoxLayout,QFrame,QTableWidgetItem
@@ -81,14 +84,10 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
                                         self.comboBoxModels.currentText()
                                         )        
 
-        sc = MyCanvas(self, width=5, height=4, dpi=100)
-        sc.axes.plot([0,1,2,3,4], [10,1,20,3,40])
-        self.verticalLayoutFigure.addWidget(sc)
-        # header=QtWidgets.QHeaderView(QtCore.Qt.Horizontal)
-        # header.setProperty('stretchLastSection')
-        # self.tableViewData.setHorizontalHeader(header)
-        # self.tableViewData.resizeColumnsToContents()
-        
+        # sc = MyCanvas(self, width=5, height=4, dpi=100)
+        # sc.axes.plot([0,1,2,3,4], [10,1,20,3,40])
+        # self.verticalLayoutTrainFig1.addWidget(sc)
+       
         self.tableWidgetData.setHorizontalHeaderLabels(["Time(s)", "Temperature"])
 
         if QSysInfo.productType() == "windows" and QSysInfo.productVersion() == "10":
@@ -109,6 +108,7 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
                     "background-color:white;"
                 "}"
             )
+        
         self.lcdNumberPredictedTemperature.setStyleSheet(
             "QLCDNumber{"
             "color:rgb(0, 208, 0);"
@@ -121,8 +121,10 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
         self.labelModelFileName.setText('')
         self.pushButtonLoadData.setEnabled(False)
         # self.show()
+        
+    def on_tabWidget_currentChanged (slef ,index) :
+        print('currentindexchanged')
 
-     
     def on_comboBoxModels_indexchanged(self,index):
         print(index)
         if(index==0):
