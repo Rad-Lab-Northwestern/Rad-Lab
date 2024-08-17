@@ -23,9 +23,14 @@ Convert py files to one main executable file:
 
 Note:it took ~25s to load GUI
 ## How Use
-1.in Predict Tab select Model or load h5 model(... button) 
+1.in Predict Tab select Model or load h5 model ("..." pushbutton) 
+
 2.Select type ofData:
-    2.1 "Upload Data": select a cvs file (time,temperature) for 11 initial points.If data have header select "With header" checkbox.Then press "Load" button to show in Table
-    or
-    2.2 "Table": write time and Temperature in Table
-3.Press "predict" Button, wait ~2second
+
+>2.1 "Upload Data": select a cvs file (time,temperature) for 11 initial points.If data have header select "With header" checkbox.Then press "Load" button to show in Table
+
+or
+
+>2.2 "Table": write time and Temperature in Table
+
+3.Press "predict" Button, wait ~2 second
