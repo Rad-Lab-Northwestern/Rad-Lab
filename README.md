@@ -23,7 +23,7 @@ Convert py files to one main executable file:
 
 Note:it took ~25s to load GUI
 ## How Use
-1.in Predict Tab select Model or load h5 model ("..." pushbutton) 
+1.in Predict Tab select Model from combobox  or load h5 model ("..." pushbutton). Note: Model combobox find your models in Models folder in the root of .exe file
 
 2.Select type ofData:
 
