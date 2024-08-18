@@ -87,7 +87,8 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
         # sc = MyCanvas(self, width=5, height=4, dpi=100)
         # sc.axes.plot([0,1,2,3,4], [10,1,20,3,40])
         # self.verticalLayoutTrainFig1.addWidget(sc)
-       
+
+        self.tableWidgetData.setHorizontalHeader(QtWidgets.QHeaderView(QtCore.Qt.Orientation.Horizontal))
         self.tableWidgetData.setHorizontalHeaderLabels(["Time(s)", "Temperature"])
 
         if QSysInfo.productType() == "windows" and QSysInfo.productVersion() == "10":
@@ -128,7 +129,8 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
     def on_comboBoxModels_indexchanged(self,index):
         print(index)
         if(index==0):
-            self.on_pushButtonLoadModel_clicked()
+            #self.on_pushButtonLoadModel_clicked()
+            pass
         else:
             self.labelModelFileName.setText('')
             self.PredictModeladdress=os.path.join(ModelPath,
@@ -137,6 +139,7 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
     
     @QtCore.pyqtSlot()
     def on_pushButtonLoadModel_clicked(self):
+        print('load model')
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getOpenFileName(self,
