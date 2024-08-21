@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>459</width>
-    <height>492</height>
+    <width>490</width>
+    <height>495</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,8 +18,8 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>441</width>
-     <height>471</height>
+     <width>471</width>
+     <height>481</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -29,7 +29,7 @@
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tabPredict">
        <attribute name="title">
@@ -85,7 +85,7 @@
          <rect>
           <x>0</x>
           <y>60</y>
-          <width>261</width>
+          <width>271</width>
           <height>381</height>
          </rect>
         </property>
@@ -246,7 +246,7 @@
        <widget class="QGroupBox" name="groupBox_2">
         <property name="geometry">
          <rect>
-          <x>270</x>
+          <x>290</x>
           <y>60</y>
           <width>161</width>
           <height>141</height>
@@ -338,7 +338,7 @@
        </attribute>
        <widget class="QComboBox" name="comboBoxTrainModels">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="geometry">
          <rect>
@@ -386,7 +386,7 @@
        </widget>
        <widget class="QPushButton" name="pushButtonTrainLoadModel">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="geometry">
          <rect>
@@ -432,7 +432,7 @@
           <item>
            <widget class="QSpinBox" name="spinBoxTrainBatchSize">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="maximum">
              <number>500</number>
@@ -464,7 +464,7 @@
           <item>
            <widget class="QDoubleSpinBox" name="doubleSpinBoxTrainLearningRate">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="suffix">
              <string/>
@@ -482,7 +482,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="">
+        <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
            <x>10</x>
@@ -502,7 +502,7 @@
           <item>
            <widget class="QSpinBox" name="spinBoxTrainEpochNum">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="maximum">
              <number>500</number>
@@ -514,7 +514,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="">
+        <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
            <x>210</x>
@@ -534,7 +534,7 @@
           <item>
            <widget class="QDoubleSpinBox" name="doubleSpinBoxTrainValidationSplit">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="suffix">
              <string>[%]</string>
@@ -553,50 +553,6 @@
          </layout>
         </widget>
        </widget>
-       <widget class="QWidget" name="layoutWidget">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>270</y>
-          <width>189</width>
-          <height>169</height>
-         </rect>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayoutTrainFig1">
-         <item>
-          <widget class="QFrame" name="frame">
-           <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="layoutWidget">
-        <property name="geometry">
-         <rect>
-          <x>230</x>
-          <y>270</y>
-          <width>189</width>
-          <height>169</height>
-         </rect>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayoutTrainFig2">
-         <item>
-          <widget class="QFrame" name="frame_3">
-           <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
        <widget class="QGroupBox" name="groupBox_5">
         <property name="geometry">
          <rect>
@@ -611,7 +567,7 @@
         </property>
         <widget class="QPushButton" name="pushButtonTrainLoadDataFile">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="geometry">
           <rect>
@@ -627,7 +583,7 @@
         </widget>
         <widget class="QCheckBox" name="checkBoxTrainWithHeader">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="geometry">
           <rect>
@@ -643,7 +599,7 @@
         </widget>
         <widget class="QPushButton" name="pushButtonTrainLoadData">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="geometry">
           <rect>
@@ -671,12 +627,12 @@
          </property>
         </widget>
        </widget>
-       <widget class="QWidget" name="">
+       <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
-          <x>100</x>
+          <x>70</x>
           <y>220</y>
-          <width>241</width>
+          <width>311</width>
           <height>41</height>
          </rect>
         </property>
@@ -684,10 +640,17 @@
          <item>
           <widget class="QPushButton" name="pushButtonTrain">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="text">
             <string>Train</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="checkBoxTrainReinitWeights">
+           <property name="text">
+            <string>Reset Weights</string>
            </property>
           </widget>
          </item>
@@ -707,7 +670,7 @@
          <item>
           <widget class="QPushButton" name="pushButtonTrainSaveModel">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="text">
             <string>Save Model</string>
@@ -715,6 +678,19 @@
           </widget>
          </item>
         </layout>
+       </widget>
+       <widget class="QProgressBar" name="progressBarTrain">
+        <property name="geometry">
+         <rect>
+          <x>50</x>
+          <y>300</y>
+          <width>361</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="value">
+         <number>0</number>
+        </property>
        </widget>
       </widget>
      </widget>

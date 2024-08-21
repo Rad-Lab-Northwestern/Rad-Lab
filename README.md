@@ -19,20 +19,32 @@ converting Ui to Py files:
 
 Convert py files to one main executable file:
 
-    pyinstaller   --onefile   main.py -n main.exe
+     pyinstaller   --onefile  main.py -n main.exe --distpath=.
 
 Note:it took ~25s to load GUI
 ## How Use
-1.in Predict Tab select Model from combobox  or load h5 model ("..." pushbutton).
+### Predict Tab
+1. in Predict Tab select Model from combobox  or load h5 model ("..." pushbutton).
 
 >Note: Model combobox finds your models in Models folder in the root of .exe file
 
-2.Select type ofData:
+2. Select type of Data:
 
->2.1 "Upload Data": select a cvs file (time,temperature) for 11 initial points.If data have header select "With header" checkbox.Then press "Load" button to show in Table
+    2.1 "Upload Data": select a cvs file (time,temperature) for 11 initial points.If data have header select "With header" checkbox.Then press "Load" button to show in Table
 
-or
+    2.2 "Table": write time and Temperature in Table
 
->2.2 "Table": write time and Temperature in Table
+3. Press "predict" Button, wait ~2 second and the results will be shown in "Predict Temperature"
 
-3.Press "predict" Button, wait ~2 second
+### Train Tab 
+
+1. in Train Tab select Model from combobox  or load h5 model ("..." pushbutton).
+
+2. set Train Parmeters 
+
+3.  in Dataset box  "Select Data File"
+> Note: File in CSV format and each row contain of samples at least 11 column (0:0.5:5s and the last column maximum temperature ).if Data have header tick "with header"
+4. Press "Load" to load adta and the figure will be shown
+5. Press "Train"   to train selected model.if you need reset weights select "Reset weights"
+6. the Loss values will be shown
+7. if you need "save" the model
