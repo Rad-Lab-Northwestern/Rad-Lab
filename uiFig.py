@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(846, 405)
+        Dialog.resize(846, 810)
         self.layoutWidget_4 = QtWidgets.QWidget(Dialog)
         self.layoutWidget_4.setGeometry(QtCore.QRect(10, 20, 391, 361))
         self.layoutWidget_4.setObjectName("layoutWidget_4")
@@ -27,6 +27,12 @@ class Ui_Dialog(object):
         self.verticalLayoutTrainFig2 = QtWidgets.QVBoxLayout(self.layoutWidget_5)
         self.verticalLayoutTrainFig2.setContentsMargins(0, 0, 0, 0)
         self.verticalLayoutTrainFig2.setObjectName("verticalLayoutTrainFig2")
+        self.layoutWidget_6 = QtWidgets.QWidget(Dialog)
+        self.layoutWidget_6.setGeometry(QtCore.QRect(10, 400, 411, 401))
+        self.layoutWidget_6.setObjectName("layoutWidget_6")
+        self.verticalLayoutTrainFig3 = QtWidgets.QVBoxLayout(self.layoutWidget_6)
+        self.verticalLayoutTrainFig3.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayoutTrainFig3.setObjectName("verticalLayoutTrainFig3")
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)

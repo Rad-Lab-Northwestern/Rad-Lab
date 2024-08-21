@@ -12,6 +12,7 @@ Packages Installation:
     pip install pyqt5-tools
     conda install pandas
     conda intsall matplotlib
+    conda install anaconda::scikit-learn
 
 converting Ui to Py files:
 

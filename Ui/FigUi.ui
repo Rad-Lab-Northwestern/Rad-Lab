@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>846</width>
-    <height>405</height>
+    <height>810</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,6 +34,17 @@
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayoutTrainFig2"/>
+  </widget>
+  <widget class="QWidget" name="layoutWidget_6">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>400</y>
+     <width>411</width>
+     <height>401</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayoutTrainFig3"/>
   </widget>
  </widget>
  <resources/>

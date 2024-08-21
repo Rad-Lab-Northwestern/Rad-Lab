@@ -20,8 +20,8 @@ from keras import initializers
 # from tensorflow.keras.wrappers.scikit_learn import KerasRegressor
 import numpy as np
 # import seaborn as sns
-# from sklearn.metrics import r2_score
-# from sklearn.metrics import mean_squared_error
+from sklearn.metrics import r2_score
+from sklearn.metrics import mean_squared_error
 # from sklearn.model_selection import train_test_split
 # from sklearn.model_selection import GridSearchCV,RandomizedSearchCV,KFold
 import pandas as pd
@@ -84,7 +84,7 @@ class FigUi(QtWidgets.QDialog,uiFig.Ui_Dialog):
             self.verticalLayoutTrainFig1.addWidget(self.toolbar1)
             self.verticalLayoutTrainFig1.addWidget(sc)
             self.verticalLayoutTrainFig1.setAlignment(Qt.AlignCenter )
-        else:
+        elif index==1:
             while self.verticalLayoutTrainFig2.count()!=0:
                 for i in range(self.verticalLayoutTrainFig2.count()):
                    self.verticalLayoutTrainFig2.takeAt(i)
@@ -92,6 +92,14 @@ class FigUi(QtWidgets.QDialog,uiFig.Ui_Dialog):
             self.verticalLayoutTrainFig2.addWidget(self.toolbar2)
             self.verticalLayoutTrainFig2.addWidget(sc)
             self.verticalLayoutTrainFig2.setAlignment(Qt.AlignCenter )
+        elif index==2:
+            while self.verticalLayoutTrainFig3.count()!=0:
+                for i in range(self.verticalLayoutTrainFig3.count()):
+                   self.verticalLayoutTrainFig3.takeAt(i)
+            self.toolbar3 = NavigationToolbar(sc, self)
+            self.verticalLayoutTrainFig3.addWidget(self.toolbar3)
+            self.verticalLayoutTrainFig3.addWidget(sc)
+            self.verticalLayoutTrainFig3.setAlignment(Qt.AlignCenter )            
 """
     keras Callbacks
 """
@@ -401,13 +409,21 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
         self.pushButtonTrain.setEnabled(True)     
 
     def reset_weights(self,model):
-        # session = K.get_session()
-        for layer in model.layers: 
-            print(layer)
-            if hasattr(layer, 'kernel_initializer'):
-                print('init kernel')
-                # layer.kernel.initializer(initializers.RandomNormal(mean=0.0, stddev=0.05, seed=None))
-                # layer.kernel.initializer.run(session=session)
+        weights = []
+        initializers = []
+        for layer in model.layers:
+            if isinstance(layer, (keras.layers.Dense, keras.layers.Conv2D)):
+                weights += [layer.kernel, layer.bias]
+                initializers += [layer.kernel_initializer, layer.bias_initializer]
+            elif isinstance(layer, keras.layers.BatchNormalization):
+                weights += [layer.gamma, layer.beta, layer.moving_mean, layer.moving_variance]
+                initializers += [layer.gamma_initializer,
+                            layer.beta_initializer,
+                            layer.moving_mean_initializer,
+                            layer.moving_variance_initializer]
+        for w, init in zip(weights, initializers):
+            w.assign(init(w.shape, dtype=w.dtype))
+
 
     @QtCore.pyqtSlot()
     def on_pushButtonTrain_clicked(self):
@@ -423,8 +439,10 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
         data_y=data.iloc[:,-1].values.astype('float')
         if(self.checkBoxTrainReinitWeights.isChecked()):
             self.reset_weights(self.TraincurrentModel)
-            opt=optimizers.Adam(self.doubleSpinBoxTrainLearningRate.value())
-            self.TraincurrentModel.compile(loss='mse',optimizer=opt,metrics=['mse'])        
+        for layer in self.TraincurrentModel.layers: print(layer.get_config(), layer.get_weights())
+
+        opt=optimizers.Adam(self.doubleSpinBoxTrainLearningRate.value())
+        self.TraincurrentModel.compile(loss='mse',optimizer=opt,metrics=['mse'])        
         history = self.TraincurrentModel.fit(data_x, data_y, 
                                              epochs=self.spinBoxTrainEpochNum.value(), 
                                              validation_split=self.doubleSpinBoxTrainValidationSplit.value()/100.0,
@@ -432,6 +450,21 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
                                              verbose=0,
                                             callbacks=[CustomCallback(self.progressBarTrain,self.spinBoxTrainEpochNum.value())])
         
+
+        predict_yfloat=self.TraincurrentModel.predict(data_x)
+        # model evaluation
+        r2_train_ann = r2_score(data_y, predict_yfloat)
+        mse_train_ann = mean_squared_error(data_y, predict_yfloat)
+
+        # The coefficients
+        print('Train R2 score: ', r2_train_ann)
+        print('Train MSE: ', mse_train_ann)
+
+
+
+        """
+            show in Fig Form
+        """
         sc2=MyCanvas(self, width=5, height=4, dpi=100)        
         sc2.axes.plot(history.history['loss'])
         sc2.axes.plot(history.history['val_loss'])
@@ -445,6 +478,21 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
         self.formFig.show()
         self.pushButtonTrainSaveModel.setEnabled(True)
 
+        sc3=MyCanvas(self, width=5, height=4, dpi=100)        
+        sc3.axes.scatter(data_y, predict_yfloat, color='#2B3467')
+        xline=np.arange(0,7)
+        sc3.axes.plot(xline, xline, color='#FFB562', label = 'y = x')
+
+        sc3.axes.legend(['train','x=y'], loc='upper left', fontsize=8)
+        sc3.axes.set_title('Train: predictions', fontsize=8)
+        sc3.axes.set_xlabel(r'Experimental Measured $\Delta$$T^{Train}_{max} (^oC)$', fontsize=8)
+        sc3.axes.set_ylabel(r'Predicted $\Delta$$T_{max} (^oC)$', fontsize=8)
+        sc3.axes.text(0,6,'$R^{2}_{train}$='+f'{r2_train_ann:.3f}', weight='bold')
+        sc3.axes.tick_params(axis='both', which='major',labelsize=8)
+        sc3.axes.grid(True)
+        self.formFig.showFig(sc3,2)
+        self.formFig.show()
+        self.pushButtonTrainSaveModel.setEnabled(True)
 
     def closeEvent(self,event):
         print("closing app")
