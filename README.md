@@ -7,12 +7,13 @@ Packages Installation:
 
     conda create -n radlab
     activate  radlab
-    conda install tensorflow keras
+    conda install tensorflow keras=2.10.0
     conda install pyqt
     pip install pyqt5-tools
-    conda install pandas
+    conda install pandas=2.2.2
     conda intsall matplotlib
-    conda install anaconda::scikit-learn
+    conda install anaconda::scikit-learn=1.5.1
+    pip install pyinstaller==6.6
 
 converting Ui to Py files:
 

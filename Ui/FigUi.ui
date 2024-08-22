@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>846</width>
+    <width>863</width>
     <height>810</height>
    </rect>
   </property>
@@ -16,10 +16,10 @@
   <widget class="QWidget" name="layoutWidget_4">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>20</y>
-     <width>391</width>
-     <height>361</height>
+     <x>11</x>
+     <y>21</y>
+     <width>411</width>
+     <height>381</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayoutTrainFig1"/>
@@ -27,10 +27,10 @@
   <widget class="QWidget" name="layoutWidget_5">
    <property name="geometry">
     <rect>
-     <x>440</x>
-     <y>20</y>
-     <width>391</width>
-     <height>361</height>
+     <x>434</x>
+     <y>21</y>
+     <width>411</width>
+     <height>381</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayoutTrainFig2"/>
@@ -38,13 +38,24 @@
   <widget class="QWidget" name="layoutWidget_6">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>400</y>
+     <x>11</x>
+     <y>414</y>
      <width>411</width>
-     <height>401</height>
+     <height>381</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayoutTrainFig3"/>
+  </widget>
+  <widget class="QWidget" name="layoutWidget_7">
+   <property name="geometry">
+    <rect>
+     <x>434</x>
+     <y>414</y>
+     <width>411</width>
+     <height>381</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayoutTrainFig4"/>
   </widget>
  </widget>
  <resources/>
