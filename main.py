@@ -5,18 +5,29 @@ from time import sleep
 """
     AI import
 """
-import keras
-# import tesnsorflow.keras as keras
+import tensorflow.keras as keras
+# import keras
+
 # from tensorflow.keras.models import Sequential
-# from tensorflow.keras.models import load_model
-from keras.models import load_model
+
+from tensorflow.keras.models import load_model
+# from keras.models import load_model #python>3.6
+
 # from tensorflow.keras.layers import Dense
 # from tensorflow.keras import activations
-from keras import losses
-from keras import optimizers
+
+from tensorflow.keras import losses
+# from keras import losses  #python>3.6
+
+from tensorflow.keras import optimizers
+# from keras import optimizers  #python>3.6
+
 # from tensorflow.keras import metrics
 # from keras import backend as K
-from keras import initializers
+
+from tensorflow.keras import initializers
+# from keras import initializers    #python>3.6
+
 # from tensorflow.keras.wrappers.scikit_learn import KerasRegressor
 import numpy as np
 # import seaborn as sns
@@ -26,6 +37,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 # from sklearn.model_selection import GridSearchCV,RandomizedSearchCV,KFold
 import pandas as pd
+
 print(keras.__version__)
 print(sklearn.__version__)
 print(pd.__version__)
@@ -46,7 +58,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets,uic
 import PyQt5
 from PyQt5.QtWidgets import QApplication,QStyle,QMessageBox,QFileDialog,QVBoxLayout,QFrame,QTableWidgetItem
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
-from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt, QThread,QByteArray,QEvent,QObject,QPoint,QSysInfo,QFileInfo
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt, QThread,QByteArray,QEvent,QObject,QPoint,QSysInfo,QFileInfo,QSize
 from PyQt5.QtGui import QPixmap
 
 """
@@ -54,8 +66,8 @@ from PyQt5.QtGui import QPixmap
 """
 import math
 import uiMain
-import uiFig
-
+import uiTrainResults
+import  uiValidResults
 """
     MainApp Class
 """
@@ -69,16 +81,97 @@ class MyCanvas(FigureCanvasQTAgg):
         self.fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = self.fig.add_subplot(111)
         super(MyCanvas, self).__init__(self.fig)
-
 """
-    FigureUi Form Class
+    uiTestResults Class
 """
-class FigUi(QtWidgets.QDialog,uiFig.Ui_Dialog):
+class formValidUi(QtWidgets.QDialog,uiValidResults.Ui_Dialog):
     def __init__(self):
-        super(FigUi,self).__init__()
+        super(formValidUi,self).__init__()
         self.setupUi(self)
+        screen=app.desktop().geometry()
+        self.setGeometry(QStyle.alignedRect(Qt.LeftToRight,
+                                        Qt.AlignLeft|Qt.AlignVCenter,
+                                        QSize(screen.width()*0.5,screen.height()*0.6),
+                                        app.primaryScreen().availableGeometry()
+                                        )
+                        )
+        self.tableWidgetData.setHorizontalHeader(QtWidgets.QHeaderView(QtCore.Qt.Horizontal))
+        # self.tableWidgetData.setHorizontalHeader(QtWidgets.QHeaderView(QtCore.Qt.Orientation.Horizontal)) #python>3.6
+        self.tableWidgetData.setHorizontalHeaderLabels([r"Experiment('C)", r"Predict('C)"])
+        if QSysInfo.productType() == "windows" and QSysInfo.productVersion() == "10":
+            self.setStyleSheet(
+                "QHeaderView::section{"
+                    "border-top:0px solid #D8D8D8;"
+                    "border-left:0px solid #D8D8D8;"
+                    "border-right:1px solid #D8D8D8;"
+                    "border-bottom: 1px solid #D8D8D8;"
+                    "background-color:white;"
+                    "padding:4px;"
+                "}"
+                "QTableCornerButton::section{"
+                    "border-top:0px solid #D8D8D8;"
+                    "border-left:0px solid #D8D8D8;"
+                    "border-right:1px solid #D8D8D8;"
+                    "border-bottom: 1px solid #D8D8D8;"
+                    "background-color:white;"
+                "}"
+            )        
 
+
+    def fillTable(self,data_C0,data_C1):
+        print(len(data_C0))
+        for r in range(self.tableWidgetData.rowCount()):
+            self.tableWidgetData.removeRow(r)
+            
+        for r in range(len(data_C0)):
+
+            c0=QTableWidgetItem(str(data_C0[r]))
+            c1=QTableWidgetItem(str(data_C1[r][0]))
+            c0.setFlags(c0.flags() ^ QtCore.Qt.ItemIsEditable)
+            c1.setFlags(c1.flags() ^ QtCore.Qt.ItemIsEditable)
+            currentIndex=self.tableWidgetData.rowCount()
+            self.tableWidgetData.setRowCount(currentIndex+1)
+            self.tableWidgetData.setItem(r,0,c0)
+            self.tableWidgetData.setItem(r,1,c1)
+        self.tableWidgetData.setVisible(False)
+        self.tableWidgetData.resizeColumnsToContents()
+        self.tableWidgetData.setVisible(True)            
+
+        # print(len(dataset.columns))
+        # r=0
+        # for index,row in  dataset.iterrows() :
+        #     if(index==0 and self.checkBoxWithHeader.isChecked()):
+        #         pass
+        #     else:
+        #         c0=QTableWidgetItem(str(row[0]))
+        #         c1=QTableWidgetItem(str(row[1]))
+        #         c0.setFlags(c0.flags() ^ QtCore.Qt.ItemIsEditable)
+        #         c1.setFlags(c1.flags() ^ QtCore.Qt.ItemIsEditable)
+        #         self.tableWidgetData.setItem(r,0,c0)
+        #         self.tableWidgetData.setItem(r,1,c1)
+        #         r+=1
+
+
+    def showFig(self,sc,index): 
+        while self.verticalLayoutTrainFig1.count()!=0:
+            for i in range(self.verticalLayoutTrainFig1.count()):
+                self.verticalLayoutTrainFig1.takeAt(i)
+
+        self.toolbar1 = NavigationToolbar(sc, self)
+        self.verticalLayoutTrainFig1.addWidget(self.toolbar1)
+        self.verticalLayoutTrainFig1.addWidget(sc)
+        self.verticalLayoutTrainFig1.setAlignment(Qt.AlignCenter )
+"""
+    uiTrainResults Class
+"""
+class formTrainUi(QtWidgets.QDialog,uiTrainResults.Ui_Dialog):
+    def __init__(self):
+        super(formTrainUi,self).__init__()
+        self.setupUi(self)
+        screen=app.desktop().geometry()
+                                            
     def showFig(self,sc,index):
+        screen=app.desktop().geometry()
         if(index==0):
             while self.verticalLayoutTrainFig1.count()!=0:
                 for i in range(self.verticalLayoutTrainFig1.count()):
@@ -88,6 +181,12 @@ class FigUi(QtWidgets.QDialog,uiFig.Ui_Dialog):
             self.verticalLayoutTrainFig1.addWidget(self.toolbar1)
             self.verticalLayoutTrainFig1.addWidget(sc)
             self.verticalLayoutTrainFig1.setAlignment(Qt.AlignCenter )
+            self.setGeometry(QStyle.alignedRect(Qt.LeftToRight,
+                                            Qt.AlignRight|Qt.AlignVCenter,
+                                            QSize(screen.width()*0.6,screen.height()*0.6),
+                                            app.primaryScreen().availableGeometry()
+                                            )
+                            )            
         elif index==1:
             while self.verticalLayoutTrainFig2.count()!=0:
                 for i in range(self.verticalLayoutTrainFig2.count()):
@@ -96,6 +195,12 @@ class FigUi(QtWidgets.QDialog,uiFig.Ui_Dialog):
             self.verticalLayoutTrainFig2.addWidget(self.toolbar2)
             self.verticalLayoutTrainFig2.addWidget(sc)
             self.verticalLayoutTrainFig2.setAlignment(Qt.AlignCenter )
+            self.setGeometry(QStyle.alignedRect(Qt.LeftToRight,
+                                            Qt.AlignRight|Qt.AlignVCenter,
+                                            QSize(screen.width()*0.6,screen.height()*0.6),
+                                            app.primaryScreen().availableGeometry()
+                                            )
+                            )            
         elif index==2:
             while self.verticalLayoutTrainFig3.count()!=0:
                 for i in range(self.verticalLayoutTrainFig3.count()):
@@ -112,6 +217,13 @@ class FigUi(QtWidgets.QDialog,uiFig.Ui_Dialog):
             self.verticalLayoutTrainFig4.addWidget(self.toolbar4)
             self.verticalLayoutTrainFig4.addWidget(sc)
             self.verticalLayoutTrainFig4.setAlignment(Qt.AlignCenter )              
+            self.setGeometry(QStyle.alignedRect(Qt.LeftToRight,
+                                            Qt.AlignRight|Qt.AlignVCenter,
+                                            QSize(screen.width()*0.6,screen.height()*0.87),
+                                            app.primaryScreen().availableGeometry()
+                                            )
+                            )            
+           
 """
     keras Callbacks
 """
@@ -143,7 +255,8 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
         self.TrainDataaddress=''
         self.TrainModeladdress=''        
         self.TraincurrentModel=None
-        self.formFig=FigUi()
+        self.formTrainUi=formTrainUi()
+        self.formValidui=formValidUi()
         
 
         h5fileslist=[f for f in os.listdir(ModelPath) if os.path.isfile(os.path.join(ModelPath,f)) and f.endswith('.h5')]
@@ -166,15 +279,11 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
                                         )     
         self.TrainModeladdress=self.PredictModeladdress
              
-        self.sc1=None
 
 
-        # sc = MyCanvas(self, width=5, height=4, dpi=100)
-        # sc.axes.plot([0,1,2,3,4], [10,1,20,3,40])
-        # self.verticalLayoutTrainFig1.addWidget(sc)
+        self.tableWidgetData.setHorizontalHeader(QtWidgets.QHeaderView(QtCore.Qt.Horizontal))
+        # self.tableWidgetData.setHorizontalHeader(QtWidgets.QHeaderView(QtCore.Qt.Orientation.Horizontal)) #python>3.6
 
-
-        self.tableWidgetData.setHorizontalHeader(QtWidgets.QHeaderView(QtCore.Qt.Orientation.Horizontal))
         self.tableWidgetData.setHorizontalHeaderLabels(["Time(s)", "Temperature"])
 
         if QSysInfo.productType() == "windows" and QSysInfo.productVersion() == "10":
@@ -209,7 +318,9 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
         self.pushButtonLoadData.setEnabled(False)
         self.pushButtonTrainLoadData.setEnabled(False)
         self.pushButtonTrain.setEnabled(False)
+        self.pushButtonValid.setEnabled(False)
         self.pushButtonTrainSaveModel.setEnabled(False)
+        self.pushButtonPredict.setEnabled(False)
 
     """
                 handle widgets of Predict
@@ -248,12 +359,12 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
             self.PredictModeladdress=fileName
             self.TrainModeladdress=fileName
 
-            print(self.PredictModeladdress)
 
     def on_radioButtonDataUpload_toggled(self):
         self.pushButtonLoadData.setEnabled(self.radioButtonDataUpload.isChecked())
         self.checkBoxWithHeader.setEnabled(self.radioButtonDataUpload.isChecked())
-        self.pushButtonLoadData.setEnabled(False)
+        # self.pushButtonLoadData.setEnabled(False)
+        self.pushButtonPredict.setEnabled(False)
         if(self.radioButtonDataUpload.isChecked()):
             for row in range(self.tableWidgetData.rowCount()):
                 item0=self.tableWidgetData.item(row,0)
@@ -265,6 +376,7 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
 
     def on_radioButtonDataTable_toggled(self):
         self.pushButtonLoadData.setEnabled(False)
+        self.pushButtonPredict.setEnabled(True)
         if(self.radioButtonDataTable.isChecked()):
             self.labelDataFileName.setText('')
             for row in range(self.tableWidgetData.rowCount()):
@@ -292,12 +404,14 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
 
     @QtCore.pyqtSlot()
     def on_pushButtonLoadData_clicked(self):
+        self.pushButtonPredict.setEnabled(True)
+        self.labelDataFileName.setText(QFileInfo(self.PredictDataaddress).fileName())
         if(self.checkBoxWithHeader.isChecked()):
-            self.PredictDataset=pd.read_csv(self.PredictDataaddress)
+            dataset=pd.read_csv(self.PredictDataaddress)
         else:
-            self.PredictDataset=pd.read_csv(self.PredictDataaddress,header=None)
+            dataset=pd.read_csv(self.PredictDataaddress,header=None)
 
-        dataset=self.PredictDataset.reset_index()
+        dataset=dataset.reset_index()
         r=0
         for index,row in  dataset.iterrows() :
             if(index==0 and self.checkBoxWithHeader.isChecked()):
@@ -310,6 +424,9 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
                 self.tableWidgetData.setItem(r,0,c0)
                 self.tableWidgetData.setItem(r,1,c1)
                 r+=1
+        self.tableWidgetData.setVisible(False)
+        self.tableWidgetData.resizeColumnsToContents()
+        self.tableWidgetData.setVisible(True)  
 
     def  on_tableWidgetData_cellPressed(self,row,column):
         print(row,column)
@@ -319,37 +436,44 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
 
     @QtCore.pyqtSlot()
     def on_pushButtonPredict_clicked(self):
-        if self.radioButtonDataTable.isChecked():
-            time=[]
-            temperature=[]
-            for row in range(self.tableWidgetData.rowCount()):
+        # if self.radioButtonDataTable.isChecked():
+        time=[]
+        temperature=[]
+        for row in range(self.tableWidgetData.rowCount()):
+            item0=self.tableWidgetData.item(row,0)
+            item1=self.tableWidgetData.item(row,1)
+
+            print('row={row}'.format(row=row))
+
+            if(item0 and item0.text()!=''):
+                pass
+            else:
+                item = QTableWidgetItem()
+                if self.radioButtonDataTable.isChecked():
+                    item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
+                    item.setText('0')
+                self.tableWidgetData.setItem(row,0,item)
                 item0=self.tableWidgetData.item(row,0)
-                item1=self.tableWidgetData.item(row,1)
 
-                print('row={row}'.format(row=row))
-
-                if(item0 and item0.text()!=''):
-                    pass
-                else:
-                    item = QTableWidgetItem()
+            if(item1 and item1.text()!=''):
+                pass
+            else:
+                item = QTableWidgetItem()
+                if self.radioButtonDataTable.isChecked():
                     item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
                     item.setText('0')
-                    self.tableWidgetData.setItem(row,0,item)
-                    item0=self.tableWidgetData.item(row,0)
-
-                if(item1 and item1.text()!=''):
-                    pass
-                else:
-                    item = QTableWidgetItem()
-                    item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
-                    item.setText('0')
-                    self.tableWidgetData.setItem(row,1,item)
-                    item1=self.tableWidgetData.item(row,1)  
                 
-                time.append(float(item0.text()))
-                temperature.append(float(item1.text()))
-            self.PredictDataset=pd.DataFrame([*zip(time,temperature)])
-        model=load_model(self.PredictModeladdress)
+                self.tableWidgetData.setItem(row,1,item)
+                item1=self.tableWidgetData.item(row,1)  
+            
+            time.append(float(item0.text()))
+            temperature.append(float(item1.text()))
+        
+        self.tableWidgetData.setVisible(False)
+        self.tableWidgetData.resizeColumnsToContents()
+        self.tableWidgetData.setVisible(True)          
+        self.PredictDataset=pd.DataFrame([*zip(time,temperature)])
+        model=load_model(self.PredictModeladdress, compile = False)
         print(model.summary())
         data_x=self.PredictDataset.iloc[:,1].values.astype('float')
         data_x=np.reshape(data_x,(1,11))
@@ -406,20 +530,29 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
         else:
             self.TrainDataset=pd.read_csv(self.TrainDataaddress,header=None)   
             data=self.TrainDataset.iloc[:,:]
-     
-        sc1=MyCanvas(self, width=5, height=4, dpi=80)
-        t= np.linspace(0,150,302)
-        for i in range(len(data)):
-            sc1.axes.plot(t,data.iloc[i,:])
-        sc1.axes.axvline(x=5,color='black',ls='--')        
-        sc1.axes.set_title("loaded Data", fontsize=8)
-        sc1.axes.set_xlabel('time (s)', fontsize=8)
-        sc1.axes.set_ylabel('Maximum Temperature $(^OC)$"', fontsize=8)
-        sc1.axes.tick_params(axis='both', which='major',labelsize=8)
-        sc1.axes.grid(True)
-        self.formFig.showFig(sc1,0)
-        self.formFig.show()
-        self.pushButtonTrain.setEnabled(True)     
+
+        if(len(data.columns)<11):
+            msgbox=QMessageBox()
+            msgbox.setIcon(QMessageBox.Critical)
+            msgbox.setWindowTitle("Error Message")
+            msgbox.setText("Column size of dataset must be >11")
+            msgbox.exec()
+        else:
+
+            sc1=MyCanvas(self, width=5, height=4, dpi=70)
+            t= np.linspace(0,150,302)
+            for i in range(len(data)):
+                sc1.axes.plot(t,data.iloc[i,:])
+            sc1.axes.axvline(x=5,color='black',ls='--')        
+            sc1.axes.set_title("loaded Data", fontsize=10)
+            sc1.axes.set_xlabel('time (s)', fontsize=10)
+            sc1.axes.set_ylabel('Maximum Temperature $(^OC)$"', fontsize=10)
+            sc1.axes.tick_params(axis='both', which='major',labelsize=10)
+            sc1.axes.grid(True)
+            self.formTrainUi.showFig(sc1,0)
+            self.formTrainUi.show()
+            self.pushButtonTrain.setEnabled(True) 
+            self.pushButtonValid.setEnabled(True)     
 
     def reset_weights(self,model):
         weights = []
@@ -442,7 +575,7 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
 
     @QtCore.pyqtSlot()
     def on_pushButtonTrain_clicked(self):
-        self.TraincurrentModel=load_model(self.TrainModeladdress)
+        self.TraincurrentModel=load_model(self.TrainModeladdress, compile = False)
         print(self.TraincurrentModel.summary())
         
         if(self.checkBoxTrainWithHeader.isChecked()):
@@ -452,7 +585,8 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
 
         data_x=data.iloc[:,0:11].values.astype('float')
         data_y=data.iloc[:,-1].values.astype('float')
-        train_x_data,test_x_data,train_y_data,test_y_data=train_test_split(data_x,data_y,test_size=0.3)
+        train_x_data,test_x_data,train_y_data,test_y_data=train_test_split(data_x,data_y,
+                                                                           test_size=self.doubleSpinBoxTrainSplitRate.value())
 
         if(self.checkBoxTrainReinitWeights.isChecked()):
             self.reset_weights(self.TraincurrentModel)
@@ -486,60 +620,103 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
         """
             show in Fig Form
         """
-        sc2=MyCanvas(self, width=5, height=4, dpi=100)        
+        sc2=MyCanvas(self, width=5, height=4, dpi=70)        
         sc2.axes.plot(history.history['loss'])
         sc2.axes.plot(history.history['val_loss'])
-        sc2.axes.legend(['Training Loss', 'Validation Loss'], fontsize=8)
-        sc2.axes.set_title("Training Loss", fontsize=8)
-        sc2.axes.set_xlabel('Epoch', fontsize=8)
-        sc2.axes.set_ylabel('Loss', fontsize=8)
-        sc2.axes.tick_params(axis='both', which='major',labelsize=8)
+        sc2.axes.legend(['Training Loss', 'Validation Loss'], fontsize=10)
+        sc2.axes.set_title("Training Loss", fontsize=10)
+        sc2.axes.set_xlabel('Epoch', fontsize=10)
+        sc2.axes.set_ylabel('Loss', fontsize=10)
+        sc2.axes.tick_params(axis='both', which='major',labelsize=10)
         sc2.axes.grid(True)
-        self.formFig.showFig(sc2,1)
-        self.formFig.show()
+        self.formTrainUi.showFig(sc2,1)
+        self.formTrainUi.show()
 
 
-        sc3=MyCanvas(self, width=5, height=4, dpi=100)        
+        sc3=MyCanvas(self, width=5, height=4, dpi=70)        
         sc3.axes.scatter(train_y_data, predict_train_y, color='#2B3467')
         xline=np.arange(0,1+np.ceil(np.max([train_y_data.max(),predict_train_y.max()])))
         sc3.axes.plot(xline, xline, color='#FFB562', label = 'y = x')
-        sc3.axes.legend(['train','x=y'], loc='upper left', fontsize=8)
-        sc3.axes.set_title('Train: predictions', fontsize=8)
-        sc3.axes.set_xlabel(r'Experimental Measured $\Delta$$T^{Train}_{max} (^oC)$', fontsize=8)
-        sc3.axes.set_ylabel(r'Predicted $\Delta$$T_{max} (^oC)$', fontsize=8)
+        sc3.axes.legend(['train','x=y'], loc='upper left', fontsize=10)
+        sc3.axes.set_title('Train: predictions', fontsize=10)
+        sc3.axes.set_xlabel(r'Experimental Measured $\Delta$$T^{Train}_{max} (^oC)$', fontsize=10)
+        sc3.axes.set_ylabel(r'Predicted $\Delta$$T_{max} (^oC)$', fontsize=10)
         sc3.axes.text(0,xline[-1]-1.5,'$R^{2}_{train}$='+f'{r2_train_ann:.3f}', weight='bold')
-        sc3.axes.tick_params(axis='both', which='major',labelsize=8)
+        sc3.axes.tick_params(axis='both', which='major',labelsize=10)
         sc3.axes.grid(True)
-        self.formFig.showFig(sc3,2)
-        self.formFig.show()
+        self.formTrainUi.showFig(sc3,2)
+        self.formTrainUi.show()
 
 
-        sc4=MyCanvas(self, width=5, height=4, dpi=100)        
+        sc4=MyCanvas(self, width=5, height=4, dpi=70)        
         sc4.axes.scatter(test_y_data, predict_test_y, color='#2B3467')
         xline=np.arange(0,1+np.ceil(np.max([test_y_data.max(),predict_test_y.max()])))
         sc4.axes.plot(xline, xline, color='#FFB562', label = 'y = x')
-        sc4.axes.legend(['test','x=y'], loc='upper left', fontsize=8)
-        sc4.axes.set_title('Test: predictions', fontsize=8)
-        sc4.axes.set_xlabel(r'Experimental Measured $\Delta$$T^{Train}_{max} (^oC)$', fontsize=8)
-        sc4.axes.set_ylabel(r'Predicted $\Delta$$T_{max} (^oC)$', fontsize=8)
+        sc4.axes.legend(['test','x=y'], loc='upper left', fontsize=10)
+        sc4.axes.set_title('Test: predictions', fontsize=10)
+        sc4.axes.set_xlabel(r'Experimental Measured $\Delta$$T^{Train}_{max} (^oC)$', fontsize=10)
+        sc4.axes.set_ylabel(r'Predicted $\Delta$$T_{max} (^oC)$', fontsize=10)
         sc4.axes.text(0,xline[-1]-1.5,'$R^{2}_{train}$='+f'{r2_test_ann:.3f}', weight='bold')
-        sc4.axes.tick_params(axis='both', which='major',labelsize=8)
+        sc4.axes.tick_params(axis='both', which='major',labelsize=10)
         sc4.axes.grid(True)
-        self.formFig.showFig(sc4,3)
-        self.formFig.show()
+        self.formTrainUi.showFig(sc4,3)
+        self.formTrainUi.show()
 
         self.pushButtonTrainSaveModel.setEnabled(True)
         
+    @QtCore.pyqtSlot()
+    def on_pushButtonValid_clicked(self):
+        self.TraincurrentModel=load_model(self.TrainModeladdress, compile = False)
+        print(self.TraincurrentModel.summary())
+        
+        if(self.checkBoxTrainWithHeader.isChecked()):
+            data=self.TrainDataset.iloc[1:,:]
+        else:
+            data=self.TrainDataset.iloc[:,:]
+
+        data_x=data.iloc[:,0:11].values.astype('float')
+        data_y=data.iloc[:,-1].values.astype('float')
+
+        predict_valid_y=self.TraincurrentModel.predict(data_x)
+
+        # model evaluation
+        r2_valid_ann = r2_score(data_y, predict_valid_y)
+        mse_valid_ann = mean_squared_error(data_y, predict_valid_y)
+        # The coefficients
+        print('Valid R2 score: ', r2_valid_ann)
+        print('Valid MSE: ', mse_valid_ann)
+
+        """
+            show in Fig Form
+        """
+        self.formValidui.fillTable(data_y,predict_valid_y)
+        sc=MyCanvas(self, width=5, height=4, dpi=70)        
+        sc.axes.scatter(data_y, predict_valid_y, color='#2B3467')
+        xline=np.arange(0,1+np.ceil(np.max([data_y.max(),predict_valid_y.max()])))
+        sc.axes.plot(xline, xline, color='#FFB562', label = 'y = x')
+        sc.axes.legend(['test','x=y'], loc='upper left', fontsize=10)
+        sc.axes.set_title('Validation: predictions', fontsize=10)
+        sc.axes.set_xlabel(r'Experimental Measured $\Delta$$T^{Valid}_{max} (^oC)$', fontsize=10)
+        sc.axes.set_ylabel(r'Predicted $\Delta$$T_{max} (^oC)$', fontsize=10)
+        sc.axes.text(0,xline[-1]-2,'$R^{2}_{train}$='+f'{r2_valid_ann:.3f}', weight='bold')
+        sc.axes.tick_params(axis='both', which='major',labelsize=10)
+        sc.axes.grid(True)
+        self.formValidui.showFig(sc,0)
+        self.formValidui.show()
+
+
 
     def closeEvent(self,event):
         print("closing app")
-        self.formFig.close()
+        self.formTrainUi.close()
+        self.formValidui.close()
         event.accept()
 
       
 """
     Star Main code
 """
+app=QApplication(sys.argv)
 def main():
     # df = pd.DataFrame([[1,2,3],[4,5,6]])
     # df = pd.DataFrame([*zip([1,2,3],[4,5,6])])
@@ -549,9 +726,14 @@ def main():
         QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling,True)
     if hasattr(QtCore.Qt,'AA_UseHighDpiPixmaps'):
         QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps,True)    
-    app=QApplication(sys.argv)
+    
     form=mainApp()
     form.setWindowFlags(QtCore.Qt.MSWindowsFixedSizeDialogHint)
+    
+    form.setGeometry(QStyle.alignedRect(Qt.LeftToRight,
+                                        Qt.AlignCenter,
+                                        form.size(),
+                                        app.primaryScreen().availableGeometry()))
     form.show()
     app.exec()
 
