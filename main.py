@@ -91,7 +91,7 @@ class formValidUi(QtWidgets.QDialog,uiValidResults.Ui_Dialog):
         screen=app.desktop().geometry()
         self.setGeometry(QStyle.alignedRect(Qt.LeftToRight,
                                         Qt.AlignLeft|Qt.AlignVCenter,
-                                        QSize(screen.width()*0.5,screen.height()*0.6),
+                                        QSize(int(np.ceil(screen.width()*0.5)),int(np.ceil(screen.height()*0.6))),
                                         app.primaryScreen().availableGeometry()
                                         )
                         )
@@ -183,10 +183,10 @@ class formTrainUi(QtWidgets.QDialog,uiTrainResults.Ui_Dialog):
             self.verticalLayoutTrainFig1.setAlignment(Qt.AlignCenter )
             self.setGeometry(QStyle.alignedRect(Qt.LeftToRight,
                                             Qt.AlignRight|Qt.AlignVCenter,
-                                            QSize(screen.width()*0.6,screen.height()*0.6),
+                                            QSize(int(np.ceil(screen.width()*0.6)),int(np.ceil(screen.height()*0.6))),
                                             app.primaryScreen().availableGeometry()
                                             )
-                            )            
+                            )                                    
         elif index==1:
             while self.verticalLayoutTrainFig2.count()!=0:
                 for i in range(self.verticalLayoutTrainFig2.count()):
@@ -197,10 +197,10 @@ class formTrainUi(QtWidgets.QDialog,uiTrainResults.Ui_Dialog):
             self.verticalLayoutTrainFig2.setAlignment(Qt.AlignCenter )
             self.setGeometry(QStyle.alignedRect(Qt.LeftToRight,
                                             Qt.AlignRight|Qt.AlignVCenter,
-                                            QSize(screen.width()*0.6,screen.height()*0.6),
+                                            QSize(int(np.ceil(screen.width()*0.6)),int(np.ceil(screen.height()*0.6))),
                                             app.primaryScreen().availableGeometry()
                                             )
-                            )            
+                            )    
         elif index==2:
             while self.verticalLayoutTrainFig3.count()!=0:
                 for i in range(self.verticalLayoutTrainFig3.count()):
@@ -219,10 +219,10 @@ class formTrainUi(QtWidgets.QDialog,uiTrainResults.Ui_Dialog):
             self.verticalLayoutTrainFig4.setAlignment(Qt.AlignCenter )              
             self.setGeometry(QStyle.alignedRect(Qt.LeftToRight,
                                             Qt.AlignRight|Qt.AlignVCenter,
-                                            QSize(screen.width()*0.6,screen.height()*0.87),
+                                            QSize(int(np.ceil(screen.width()*0.6)),int(np.ceil(screen.height()*0.87))),
                                             app.primaryScreen().availableGeometry()
                                             )
-                            )            
+                            )               
            
 """
     keras Callbacks
@@ -734,6 +734,8 @@ def main():
                                         Qt.AlignCenter,
                                         form.size(),
                                         app.primaryScreen().availableGeometry()))
+    
+    
     form.show()
     app.exec()
 
