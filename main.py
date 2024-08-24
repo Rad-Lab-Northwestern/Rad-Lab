@@ -77,9 +77,9 @@ ModelPath=".\\Models"
     Canvas Class
 """
 class MyCanvas(FigureCanvasQTAgg):
-    def __init__(self, parent=None, width=5, height=4, dpi=100):
+    def __init__(self, parent=None, width=5, height=4, row=1,column=1, dpi=70):
         self.fig = Figure(figsize=(width, height), dpi=dpi)
-        self.axes = self.fig.add_subplot(111)
+        self.axes = self.fig.subplots(row,column) #fig.add_subplot(111)
         super(MyCanvas, self).__init__(self.fig)
 """
     uiTestResults Class
@@ -88,6 +88,7 @@ class formValidUi(QtWidgets.QDialog,uiValidResults.Ui_Dialog):
     def __init__(self):
         super(formValidUi,self).__init__()
         self.setupUi(self)
+
         screen=app.desktop().geometry()
         self.setGeometry(QStyle.alignedRect(Qt.LeftToRight,
                                         Qt.AlignLeft|Qt.AlignVCenter,
@@ -117,6 +118,13 @@ class formValidUi(QtWidgets.QDialog,uiValidResults.Ui_Dialog):
                 "}"
             )        
 
+        self.canvas1=MyCanvas(self)
+
+        self.toolbar1 = NavigationToolbar(self.canvas1,self)
+        self.verticalLayoutValidFig1.addWidget(self.toolbar1)
+        self.verticalLayoutValidFig1.addWidget(self.canvas1)
+        self.verticalLayoutValidFig1.setAlignment(Qt.AlignCenter ) 
+
 
     def fillTable(self,data_C0,data_C1):
         print(len(data_C0))
@@ -137,15 +145,16 @@ class formValidUi(QtWidgets.QDialog,uiValidResults.Ui_Dialog):
         self.tableWidgetData.resizeColumnsToContents()
         self.tableWidgetData.setVisible(True)            
 
-    def showFig(self,sc,index): 
-        while self.verticalLayoutTrainFig1.count()!=0:
-            for i in range(self.verticalLayoutTrainFig1.count()):
-                self.verticalLayoutTrainFig1.takeAt(i)
+    def getaxes(self,index):
+        if(index==1):
+            self.canvas1.fig.axes[0].clear()
+            return self.canvas1.fig.axes[0]
+         
+    def show(self,index):
+        if(index==1):
+            self.canvas1.draw_idle()
+        super().show()
 
-        self.toolbar1 = NavigationToolbar(sc, self)
-        self.verticalLayoutTrainFig1.addWidget(self.toolbar1)
-        self.verticalLayoutTrainFig1.addWidget(sc)
-        self.verticalLayoutTrainFig1.setAlignment(Qt.AlignCenter )
 """
     uiTrainResults Class
 """
@@ -153,57 +162,64 @@ class formTrainUi(QtWidgets.QDialog,uiTrainResults.Ui_Dialog):
     def __init__(self):
         super(formTrainUi,self).__init__()
         self.setupUi(self)
+
         screen=app.desktop().geometry()
         self.setGeometry(QStyle.alignedRect(Qt.LeftToRight,
                                         Qt.AlignRight|Qt.AlignVCenter,
                                         QSize(int(np.ceil(screen.width()*0.6)),int(np.ceil(screen.height()*0.87))),
                                         app.primaryScreen().availableGeometry()
                                         )
-                        )           
-                                             
-    def showFig(self,sc,index):
-        screen=app.desktop().geometry()
-        if(index==0):
-            print(self.verticalLayoutTrainFig1.count())
-            while self.verticalLayoutTrainFig1.count()!=0:
-                for i in range(self.verticalLayoutTrainFig1.count()):
-                   self.verticalLayoutTrainFig1.takeAt(i)
-            print(self.verticalLayoutTrainFig1.count())     
-            print('0>>>>>>>>>>>>>>')              
+                        ) 
+                  
+        self.canvas1=MyCanvas(self)
+        self.canvas2=MyCanvas(self)
+        self.canvas3=MyCanvas(self)
+        self.canvas4=MyCanvas(self)
 
-            self.toolbar1 = NavigationToolbar(sc, self)
-            self.verticalLayoutTrainFig1.addWidget(self.toolbar1)
-            self.verticalLayoutTrainFig1.addWidget(sc)
-            self.verticalLayoutTrainFig1.setAlignment(Qt.AlignCenter )
-        elif index==1:
-            print(self.verticalLayoutTrainFig2.count())
-            while self.verticalLayoutTrainFig2.count()!=0:
-                for i in range(self.verticalLayoutTrainFig2.count()):
-                   self.verticalLayoutTrainFig2.takeAt(i)
-            print(self.verticalLayoutTrainFig2.count())     
-            print('1>>>>>>>>>>>>>>')              
-            self.toolbar2 = NavigationToolbar(sc, self)
-            self.verticalLayoutTrainFig2.addWidget(self.toolbar2)
-            self.verticalLayoutTrainFig2.addWidget(sc)
-            self.verticalLayoutTrainFig2.setAlignment(Qt.AlignCenter )
-        elif index==2:
-            while self.verticalLayoutTrainFig3.count()!=0:
-                for i in range(self.verticalLayoutTrainFig3.count()):
-                   self.verticalLayoutTrainFig3.takeAt(i)
-            self.toolbar3 = NavigationToolbar(sc, self)
-            self.verticalLayoutTrainFig3.addWidget(self.toolbar3)
-            self.verticalLayoutTrainFig3.addWidget(sc)
-            self.verticalLayoutTrainFig3.setAlignment(Qt.AlignCenter )            
-        elif index==3:
-            while self.verticalLayoutTrainFig4.count()!=0:
-                for i in range(self.verticalLayoutTrainFig4.count()):
-                   self.verticalLayoutTrainFig4.takeAt(i)
-            self.toolbar4 = NavigationToolbar(sc, self)
-            self.verticalLayoutTrainFig4.addWidget(self.toolbar4)
-            self.verticalLayoutTrainFig4.addWidget(sc)
-            self.verticalLayoutTrainFig4.setAlignment(Qt.AlignCenter )              
-           
-           
+        self.toolbar1 = NavigationToolbar(self.canvas1,self)
+        self.verticalLayoutTrainFig1.addWidget(self.toolbar1)
+        self.verticalLayoutTrainFig1.addWidget(self.canvas1)
+        self.verticalLayoutTrainFig1.setAlignment(Qt.AlignCenter ) 
+
+        self.toolbar2 = NavigationToolbar(self.canvas2,self)
+        self.verticalLayoutTrainFig2.addWidget(self.toolbar2)
+        self.verticalLayoutTrainFig2.addWidget(self.canvas2)
+        self.verticalLayoutTrainFig2.setAlignment(Qt.AlignCenter ) 
+
+        self.toolbar3 = NavigationToolbar(self.canvas3,self)
+        self.verticalLayoutTrainFig3.addWidget(self.toolbar3)
+        self.verticalLayoutTrainFig3.addWidget(self.canvas3)
+        self.verticalLayoutTrainFig3.setAlignment(Qt.AlignCenter ) 
+
+        self.toolbar4 = NavigationToolbar(self.canvas4,self)
+        self.verticalLayoutTrainFig4.addWidget(self.toolbar4)
+        self.verticalLayoutTrainFig4.addWidget(self.canvas4)
+        self.verticalLayoutTrainFig4.setAlignment(Qt.AlignCenter ) 
+
+    def getaxes(self,index):
+        if(index==1):
+            self.canvas1.fig.axes[0].clear()
+            return self.canvas1.fig.axes[0]
+        elif(index==2):
+            self.canvas2.fig.axes[0].clear()
+            return self.canvas2.fig.axes[0]
+        elif(index==3):
+            self.canvas3.fig.axes[0].clear()
+            return self.canvas3.fig.axes[0]
+        elif(index==4):
+            self.canvas4.fig.axes[0].clear()
+            return self.canvas4.fig.axes[0]
+        
+    def show(self,index):
+        if(index==1):
+            self.canvas1.draw_idle()
+        elif (index==2):
+            self.canvas2.draw_idle()
+        elif(index==3):
+            self.canvas3.draw_idle()
+        elif(index==4):
+            self.canvas4.draw_idle()
+        super().show()
 """
     keras Callbacks
 """
@@ -237,7 +253,7 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
         self.TraincurrentModel=None
         self.formTrainUi=formTrainUi()
         self.formValidui=formValidUi()
-        
+  
 
         h5fileslist=[f for f in os.listdir(ModelPath) if os.path.isfile(os.path.join(ModelPath,f)) and f.endswith('.h5')]
         h5fileslist.insert(0,'---')
@@ -518,19 +534,18 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
             msgbox.setText("Column size of dataset must be >11")
             msgbox.exec()
         else:
-
-            sc1=MyCanvas(self, width=5, height=4, dpi=70)
+            
+            ax=self.formTrainUi.getaxes(1)
             t= np.linspace(0,150,302)
             for i in range(len(data)):
-                sc1.axes.plot(t,data.iloc[i,:])
-            sc1.axes.axvline(x=5,color='black',ls='--')        
-            sc1.axes.set_title("loaded Data", fontsize=10)
-            sc1.axes.set_xlabel('time (s)', fontsize=10)
-            sc1.axes.set_ylabel('Maximum Temperature $(^OC)$"', fontsize=10)
-            sc1.axes.tick_params(axis='both', which='major',labelsize=10)
-            sc1.axes.grid(True)
-            self.formTrainUi.showFig(sc1,0)
-            self.formTrainUi.show()
+                ax.plot(t,data.iloc[i,:])
+            ax.axvline(x=5,color='black',ls='--')        
+            ax.set_title("loaded Data", fontsize=10)
+            ax.set_xlabel('time (s)', fontsize=10)
+            ax.set_ylabel('Maximum Temperature $(^OC)$"', fontsize=10)
+            ax.tick_params(axis='both', which='major',labelsize=10)
+            ax.grid(True)
+            self.formTrainUi.show(1)
             self.pushButtonTrain.setEnabled(True) 
             self.pushButtonValid.setEnabled(True)     
 
@@ -600,45 +615,44 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
         """
             show in Fig Form
         """
-        sc2=MyCanvas(self, width=5, height=4, dpi=70)        
-        sc2.axes.plot(history.history['loss'])
-        sc2.axes.plot(history.history['val_loss'])
-        sc2.axes.legend(['Training Loss', 'Validation Loss'], fontsize=10)
-        sc2.axes.set_title("Training Loss", fontsize=10)
-        sc2.axes.set_xlabel('Epoch', fontsize=10)
-        sc2.axes.set_ylabel('Loss', fontsize=10)
-        sc2.axes.tick_params(axis='both', which='major',labelsize=10)
-        sc2.axes.grid(True)
-        self.formTrainUi.showFig(sc2,1)
+        ax=self.formTrainUi.getaxes(2)
+        ax.plot(history.history['loss'])
+        ax.plot(history.history['val_loss'])
+        ax.legend(['Training Loss', 'Validation Loss'], fontsize=10)
+        ax.set_title("Training Loss", fontsize=10)
+        ax.set_xlabel('Epoch', fontsize=10)
+        ax.set_ylabel('Loss', fontsize=10)
+        ax.tick_params(axis='both', which='major',labelsize=10)
+        ax.grid(True)
+        self.formTrainUi.show(2)
 
 
-        sc3=MyCanvas(self, width=5, height=4, dpi=70)        
-        sc3.axes.scatter(train_y_data, predict_train_y, color='#2B3467')
+        ax=self.formTrainUi.getaxes(3)
+        ax.scatter(train_y_data, predict_train_y, color='#2B3467')
         xline=np.arange(0,1+np.ceil(np.max([train_y_data.max(),predict_train_y.max()])))
-        sc3.axes.plot(xline, xline, color='#FFB562', label = 'y = x')
-        sc3.axes.legend(['train','x=y'], loc='upper left', fontsize=10)
-        sc3.axes.set_title('Train: predictions', fontsize=10)
-        sc3.axes.set_xlabel(r'Experimental Measured $\Delta$$T^{Train}_{max} (^oC)$', fontsize=10)
-        sc3.axes.set_ylabel(r'Predicted $\Delta$$T_{max} (^oC)$', fontsize=10)
-        sc3.axes.text(0,xline[-1]-1.5,'$R^{2}_{train}$='+f'{r2_train_ann:.3f}', weight='bold')
-        sc3.axes.tick_params(axis='both', which='major',labelsize=10)
-        sc3.axes.grid(True)
-        self.formTrainUi.showFig(sc3,2)
+        ax.plot(xline, xline, color='#FFB562', label = 'y = x')
+        ax.legend(['train','x=y'], loc='upper left', fontsize=10)
+        ax.set_title('Train: predictions', fontsize=10)
+        ax.set_xlabel(r'Experimental Measured $\Delta$$T^{Train}_{max} (^oC)$', fontsize=10)
+        ax.set_ylabel(r'Predicted $\Delta$$T_{max} (^oC)$', fontsize=10)
+        ax.text(0,xline[-1]-1.5,'$R^{2}_{train}$='+f'{r2_train_ann:.3f}', weight='bold')
+        ax.tick_params(axis='both', which='major',labelsize=10)
+        ax.grid(True)
+        self.formTrainUi.show(3)
 
 
-        sc4=MyCanvas(self, width=5, height=4, dpi=70)        
-        sc4.axes.scatter(test_y_data, predict_test_y, color='#2B3467')
+        ax=self.formTrainUi.getaxes(4)
+        ax.scatter(test_y_data, predict_test_y, color='#2B3467')
         xline=np.arange(0,1+np.ceil(np.max([test_y_data.max(),predict_test_y.max()])))
-        sc4.axes.plot(xline, xline, color='#FFB562', label = 'y = x')
-        sc4.axes.legend(['test','x=y'], loc='upper left', fontsize=10)
-        sc4.axes.set_title('Test: predictions', fontsize=10)
-        sc4.axes.set_xlabel(r'Experimental Measured $\Delta$$T^{Train}_{max} (^oC)$', fontsize=10)
-        sc4.axes.set_ylabel(r'Predicted $\Delta$$T_{max} (^oC)$', fontsize=10)
-        sc4.axes.text(0,xline[-1]-1.5,'$R^{2}_{train}$='+f'{r2_test_ann:.3f}', weight='bold')
-        sc4.axes.tick_params(axis='both', which='major',labelsize=10)
-        sc4.axes.grid(True)
-        self.formTrainUi.showFig(sc4,3)
-        self.formTrainUi.show()
+        ax.plot(xline, xline, color='#FFB562', label = 'y = x')
+        ax.legend(['test','x=y'], loc='upper left', fontsize=10)
+        ax.set_title('Test: predictions', fontsize=10)
+        ax.set_xlabel(r'Experimental Measured $\Delta$$T^{Train}_{max} (^oC)$', fontsize=10)
+        ax.set_ylabel(r'Predicted $\Delta$$T_{max} (^oC)$', fontsize=10)
+        ax.text(0,xline[-1]-1.5,'$R^{2}_{train}$='+f'{r2_test_ann:.3f}', weight='bold')
+        ax.tick_params(axis='both', which='major',labelsize=10)
+        ax.grid(True)
+        self.formTrainUi.show(4)
 
         self.pushButtonTrainSaveModel.setEnabled(True)
         
@@ -663,25 +677,26 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
         # The coefficients
         print('Valid R2 score: ', r2_valid_ann)
         print('Valid MSE: ', mse_valid_ann)
-
+        """
+            Fill Table
+        """
+        self.formValidui.fillTable(data_y,predict_valid_y)
         """
             show in Fig Form
         """
-        self.formValidui.fillTable(data_y,predict_valid_y)
-        sc=MyCanvas(self, width=5, height=4, dpi=70)        
-        sc.axes.scatter(data_y, predict_valid_y, color='#2B3467')
-        xline=np.arange(0,1+np.ceil(np.max([data_y.max(),predict_valid_y.max()])))
-        sc.axes.plot(xline, xline, color='#FFB562', label = 'y = x')
-        sc.axes.legend(['test','x=y'], loc='upper left', fontsize=10)
-        sc.axes.set_title('Validation: predictions', fontsize=10)
-        sc.axes.set_xlabel(r'Experimental Measured $\Delta$$T^{Valid}_{max} (^oC)$', fontsize=10)
-        sc.axes.set_ylabel(r'Predicted $\Delta$$T_{max} (^oC)$', fontsize=10)
-        sc.axes.text(0,xline[-1]-2,'$R^{2}_{train}$='+f'{r2_valid_ann:.3f}', weight='bold')
-        sc.axes.tick_params(axis='both', which='major',labelsize=10)
-        sc.axes.grid(True)
-        self.formValidui.showFig(sc,0)
-        self.formValidui.show()
 
+        ax=self.formValidui.getaxes(1)       
+        ax.scatter(data_y, predict_valid_y, color='#2B3467')
+        xline=np.arange(0,1+np.ceil(np.max([data_y.max(),predict_valid_y.max()])))
+        ax.plot(xline, xline, color='#FFB562', label = 'y = x')
+        ax.legend(['test','x=y'], loc='upper left', fontsize=10)
+        ax.set_title('Validation: predictions', fontsize=10)
+        ax.set_xlabel(r'Experimental Measured $\Delta$$T^{Valid}_{max} (^oC)$', fontsize=10)
+        ax.set_ylabel(r'Predicted $\Delta$$T_{max} (^oC)$', fontsize=10)
+        ax.text(0,xline[-1]-2,'$R^{2}_{train}$='+f'{r2_valid_ann:.3f}', weight='bold')
+        ax.tick_params(axis='both', which='major',labelsize=10)
+        ax.grid(True)
+        self.formValidui.show(1)
 
 
     def closeEvent(self,event):
