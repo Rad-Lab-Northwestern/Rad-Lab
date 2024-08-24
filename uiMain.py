@@ -184,7 +184,7 @@ class Ui_Dialog(object):
         self.doubleSpinBoxTrainSplitRate.setSuffix("")
         self.doubleSpinBoxTrainSplitRate.setDecimals(2)
         self.doubleSpinBoxTrainSplitRate.setMaximum(1.0)
-        self.doubleSpinBoxTrainSplitRate.setProperty("value", 0.01)
+        self.doubleSpinBoxTrainSplitRate.setProperty("value", 0.3)
         self.doubleSpinBoxTrainSplitRate.setObjectName("doubleSpinBoxTrainSplitRate")
         self.horizontalLayout_5.addWidget(self.doubleSpinBoxTrainSplitRate)
         self.gridLayout_2.addLayout(self.horizontalLayout_5, 2, 0, 1, 1)
@@ -235,7 +235,7 @@ class Ui_Dialog(object):
         self.verticalLayout.addWidget(self.tabWidget)
 
         self.retranslateUi(Dialog)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
         self.comboBoxModels.setCurrentIndex(-1)
         self.comboBoxTrainModels.setCurrentIndex(-1)
         QtCore.QMetaObject.connectSlotsByName(Dialog)

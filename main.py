@@ -137,21 +137,6 @@ class formValidUi(QtWidgets.QDialog,uiValidResults.Ui_Dialog):
         self.tableWidgetData.resizeColumnsToContents()
         self.tableWidgetData.setVisible(True)            
 
-        # print(len(dataset.columns))
-        # r=0
-        # for index,row in  dataset.iterrows() :
-        #     if(index==0 and self.checkBoxWithHeader.isChecked()):
-        #         pass
-        #     else:
-        #         c0=QTableWidgetItem(str(row[0]))
-        #         c1=QTableWidgetItem(str(row[1]))
-        #         c0.setFlags(c0.flags() ^ QtCore.Qt.ItemIsEditable)
-        #         c1.setFlags(c1.flags() ^ QtCore.Qt.ItemIsEditable)
-        #         self.tableWidgetData.setItem(r,0,c0)
-        #         self.tableWidgetData.setItem(r,1,c1)
-        #         r+=1
-
-
     def showFig(self,sc,index): 
         while self.verticalLayoutTrainFig1.count()!=0:
             for i in range(self.verticalLayoutTrainFig1.count()):
@@ -169,38 +154,38 @@ class formTrainUi(QtWidgets.QDialog,uiTrainResults.Ui_Dialog):
         super(formTrainUi,self).__init__()
         self.setupUi(self)
         screen=app.desktop().geometry()
-                                            
+        self.setGeometry(QStyle.alignedRect(Qt.LeftToRight,
+                                        Qt.AlignRight|Qt.AlignVCenter,
+                                        QSize(int(np.ceil(screen.width()*0.6)),int(np.ceil(screen.height()*0.87))),
+                                        app.primaryScreen().availableGeometry()
+                                        )
+                        )           
+                                             
     def showFig(self,sc,index):
         screen=app.desktop().geometry()
         if(index==0):
+            print(self.verticalLayoutTrainFig1.count())
             while self.verticalLayoutTrainFig1.count()!=0:
                 for i in range(self.verticalLayoutTrainFig1.count()):
                    self.verticalLayoutTrainFig1.takeAt(i)
+            print(self.verticalLayoutTrainFig1.count())     
+            print('0>>>>>>>>>>>>>>')              
 
             self.toolbar1 = NavigationToolbar(sc, self)
             self.verticalLayoutTrainFig1.addWidget(self.toolbar1)
             self.verticalLayoutTrainFig1.addWidget(sc)
             self.verticalLayoutTrainFig1.setAlignment(Qt.AlignCenter )
-            self.setGeometry(QStyle.alignedRect(Qt.LeftToRight,
-                                            Qt.AlignRight|Qt.AlignVCenter,
-                                            QSize(int(np.ceil(screen.width()*0.6)),int(np.ceil(screen.height()*0.6))),
-                                            app.primaryScreen().availableGeometry()
-                                            )
-                            )                                    
         elif index==1:
+            print(self.verticalLayoutTrainFig2.count())
             while self.verticalLayoutTrainFig2.count()!=0:
                 for i in range(self.verticalLayoutTrainFig2.count()):
                    self.verticalLayoutTrainFig2.takeAt(i)
+            print(self.verticalLayoutTrainFig2.count())     
+            print('1>>>>>>>>>>>>>>')              
             self.toolbar2 = NavigationToolbar(sc, self)
             self.verticalLayoutTrainFig2.addWidget(self.toolbar2)
             self.verticalLayoutTrainFig2.addWidget(sc)
             self.verticalLayoutTrainFig2.setAlignment(Qt.AlignCenter )
-            self.setGeometry(QStyle.alignedRect(Qt.LeftToRight,
-                                            Qt.AlignRight|Qt.AlignVCenter,
-                                            QSize(int(np.ceil(screen.width()*0.6)),int(np.ceil(screen.height()*0.6))),
-                                            app.primaryScreen().availableGeometry()
-                                            )
-                            )    
         elif index==2:
             while self.verticalLayoutTrainFig3.count()!=0:
                 for i in range(self.verticalLayoutTrainFig3.count()):
@@ -217,12 +202,7 @@ class formTrainUi(QtWidgets.QDialog,uiTrainResults.Ui_Dialog):
             self.verticalLayoutTrainFig4.addWidget(self.toolbar4)
             self.verticalLayoutTrainFig4.addWidget(sc)
             self.verticalLayoutTrainFig4.setAlignment(Qt.AlignCenter )              
-            self.setGeometry(QStyle.alignedRect(Qt.LeftToRight,
-                                            Qt.AlignRight|Qt.AlignVCenter,
-                                            QSize(int(np.ceil(screen.width()*0.6)),int(np.ceil(screen.height()*0.87))),
-                                            app.primaryScreen().availableGeometry()
-                                            )
-                            )               
+           
            
 """
     keras Callbacks
@@ -630,7 +610,6 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
         sc2.axes.tick_params(axis='both', which='major',labelsize=10)
         sc2.axes.grid(True)
         self.formTrainUi.showFig(sc2,1)
-        self.formTrainUi.show()
 
 
         sc3=MyCanvas(self, width=5, height=4, dpi=70)        
@@ -645,7 +624,6 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
         sc3.axes.tick_params(axis='both', which='major',labelsize=10)
         sc3.axes.grid(True)
         self.formTrainUi.showFig(sc3,2)
-        self.formTrainUi.show()
 
 
         sc4=MyCanvas(self, width=5, height=4, dpi=70)        
@@ -735,7 +713,7 @@ def main():
                                         form.size(),
                                         app.primaryScreen().availableGeometry()))
     
-    
+
     form.show()
     app.exec()
 
