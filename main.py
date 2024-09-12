@@ -243,6 +243,7 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
     def __init__(self,parent=None):
         super(mainApp,self).__init__(parent)
         self.setupUi(self)
+        self.ispredicted=False
         self.PredictDataset=None
         self.PredictModeladdress=''
         self.PredictDataaddress=''
@@ -279,8 +280,7 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
 
         self.tableWidgetData.setHorizontalHeader(QtWidgets.QHeaderView(QtCore.Qt.Horizontal))
         # self.tableWidgetData.setHorizontalHeader(QtWidgets.QHeaderView(QtCore.Qt.Orientation.Horizontal)) #python>3.6
-
-        self.tableWidgetData.setHorizontalHeaderLabels(["Time(s)", "Temperature"])
+        # self.tableWidgetData.setHorizontalHeaderLabels(["Time(s)", "Temperature"])
 
         if QSysInfo.productType() == "windows" and QSysInfo.productVersion() == "10":
             self.setStyleSheet(
@@ -355,7 +355,6 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
             self.PredictModeladdress=fileName
             self.TrainModeladdress=fileName
 
-
     def on_radioButtonDataUpload_toggled(self):
         self.pushButtonLoadData.setEnabled(self.radioButtonDataUpload.isChecked())
         self.checkBoxWithHeader.setEnabled(self.radioButtonDataUpload.isChecked())
@@ -400,85 +399,73 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
 
     @QtCore.pyqtSlot()
     def on_pushButtonLoadData_clicked(self):
+        self.ispredicted=False
         self.pushButtonPredict.setEnabled(True)
         self.labelDataFileName.setText(QFileInfo(self.PredictDataaddress).fileName())
+                
         if(self.checkBoxWithHeader.isChecked()):
             dataset=pd.read_csv(self.PredictDataaddress)
         else:
             dataset=pd.read_csv(self.PredictDataaddress,header=None)
+        self.tableWidgetData.clear()
+        self.tableWidgetData.setColumnCount(len(dataset.axes[1]))
+        self.tableWidgetData.setRowCount(len(dataset.axes[0]))
 
-        dataset=dataset.reset_index()
-        r=0
-        for index,row in  dataset.iterrows() :
-            if(index==0 and self.checkBoxWithHeader.isChecked()):
-                pass
-            else:
-                c0=QTableWidgetItem(str(row[0]))
-                c1=QTableWidgetItem(str(row[1]))
-                c0.setFlags(c0.flags() ^ QtCore.Qt.ItemIsEditable)
-                c1.setFlags(c1.flags() ^ QtCore.Qt.ItemIsEditable)
-                self.tableWidgetData.setItem(r,0,c0)
-                self.tableWidgetData.setItem(r,1,c1)
-                r+=1
+        if(self.checkBoxWithHeader.isChecked()):
+            self.tableWidgetData.setHorizontalHeaderLabels(list(dataset.columns))
+        for rowindex in range(0,len(dataset.axes[0])):
+            row=dataset.iloc[rowindex].values
+            for colindex in range(0,len(dataset.axes[1])):
+                try:
+                    c=QTableWidgetItem('{:.02f}'.format(row[colindex]))
+                except:
+                    c=QTableWidgetItem(str(row[colindex]))
+                c.setFlags(c.flags() ^ QtCore.Qt.ItemIsEditable)
+                self.tableWidgetData.setItem(rowindex,colindex,c)
         self.tableWidgetData.setVisible(False)
         self.tableWidgetData.resizeColumnsToContents()
         self.tableWidgetData.setVisible(True)  
 
     def  on_tableWidgetData_cellPressed(self,row,column):
         print(row,column)
-        item=self.tableWidgetData.item(row,column)
-        # if(item):
-        #    print(item.text())
+        if(self.ispredicted):
+            current_item=self.tableWidgetData.item(self.tableWidgetData.rowCount()-1,column)
+            activeresult=float(current_item.text())
+            self.lcdNumberPredictedTemperature.display('{:.02f}'.format(activeresult))
+
 
     @QtCore.pyqtSlot()
     def on_pushButtonPredict_clicked(self):
-        # if self.radioButtonDataTable.isChecked():
-        time=[]
-        temperature=[]
-        for row in range(self.tableWidgetData.rowCount()):
-            item0=self.tableWidgetData.item(row,0)
-            item1=self.tableWidgetData.item(row,1)
-
-            print('row={row}'.format(row=row))
-
-            if(item0 and item0.text()!=''):
-                pass
-            else:
-                item = QTableWidgetItem()
-                if self.radioButtonDataTable.isChecked():
-                    item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
-                    item.setText('0')
-                self.tableWidgetData.setItem(row,0,item)
-                item0=self.tableWidgetData.item(row,0)
-
-            if(item1 and item1.text()!=''):
-                pass
-            else:
-                item = QTableWidgetItem()
-                if self.radioButtonDataTable.isChecked():
-                    item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
-                    item.setText('0')
-                
-                self.tableWidgetData.setItem(row,1,item)
-                item1=self.tableWidgetData.item(row,1)  
-            
-            time.append(float(item0.text()))
-            temperature.append(float(item1.text()))
-        
+        model=load_model(self.PredictModeladdress, compile = False)
+        # print(model.summary())
+        Tablecol=self.tableWidgetData.columnCount()
+        Tablerow=self.tableWidgetData.rowCount()
+        self.tableWidgetData.insertRow(Tablerow)
+        for col in range(1,Tablecol):
+                temprature=[]
+                for row in range(0,Tablerow):
+                    # print(row,col)
+                    item=self.tableWidgetData.item(row,col)
+                    temprature.append(float(item.text()))
+                data_x=[float(t) for t in temprature]
+                data_x=np.reshape(data_x,(1,11))
+                result=model.predict(data_x)
+                resultitem = QTableWidgetItem()
+                resultitem.setText('{:.02f}'.format(result[0][0]))
+                resultitem.setFlags(resultitem.flags() ^ QtCore.Qt.ItemIsEditable)
+                resultitem.setBackground(QtGui.QColor(0,100,0))
+                self.tableWidgetData.setItem(Tablerow,col,resultitem)
+    
         self.tableWidgetData.setVisible(False)
         self.tableWidgetData.resizeColumnsToContents()
-        self.tableWidgetData.setVisible(True)          
-        self.PredictDataset=pd.DataFrame([*zip(time,temperature)])
-        model=load_model(self.PredictModeladdress, compile = False)
-        print(model.summary())
-        data_x=self.PredictDataset.iloc[:,1].values.astype('float')
-        data_x=np.reshape(data_x,(1,11))
-        result=model.predict(data_x)
-        print(result[0])
-        self.lcdNumberPredictedTemperature.display('{:.02f}'.format(result[0][0]))
-
+        self.tableWidgetData.setVisible(True)   
+        self.tableWidgetData.scrollToBottom()
+        current_item=self.tableWidgetData.item(Tablerow,1)
+        activeresult=float(current_item.text())
+        self.lcdNumberPredictedTemperature.display('{:.02f}'.format(activeresult))
+        self.ispredicted=True
     """
-                handle widgets of Train
+                handle widgets of Train/Validate
     """   
     @QtCore.pyqtSlot()
     def on_pushButtonTrainSaveModel_clicked(self):
@@ -536,7 +523,7 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
         else:
             
             ax=self.formTrainUi.getaxes(1)
-            t= np.linspace(0,150,302)
+            t= np.linspace(0,150,len(data.axes[1]))
             for i in range(len(data)):
                 ax.plot(t,data.iloc[i,:])
             ax.axvline(x=5,color='black',ls='--')        
@@ -566,7 +553,6 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
                             layer.moving_variance_initializer]
         for w, init in zip(weights, initializers):
             w.assign(init(w.shape, dtype=w.dtype))
-
 
     @QtCore.pyqtSlot()
     def on_pushButtonTrain_clicked(self):
@@ -698,7 +684,6 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
         ax.grid(True)
         self.formValidui.show(1)
 
-
     def closeEvent(self,event):
         print("closing app")
         self.formTrainUi.close()
@@ -707,13 +692,10 @@ class mainApp(QtWidgets.QDialog,uiMain.Ui_Dialog):
 
       
 """
-    Star Main code
+    Start Main code
 """
 app=QApplication(sys.argv)
 def main():
-    # df = pd.DataFrame([[1,2,3],[4,5,6]])
-    # df = pd.DataFrame([*zip([1,2,3],[4,5,6])])
-    # print(df)
     os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"]="1"
     if hasattr(QtCore.Qt,'AA_EnableHighDpiScaling'):
         QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling,True)
@@ -728,7 +710,6 @@ def main():
                                         form.size(),
                                         app.primaryScreen().availableGeometry()))
     
-
     form.show()
     app.exec()
 
